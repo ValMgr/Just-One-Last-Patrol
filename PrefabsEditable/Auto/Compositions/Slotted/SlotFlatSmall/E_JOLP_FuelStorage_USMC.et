@@ -1,0 +1,7 @@
+GenericEntity : "{6D2A35DA74224780}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatSmall/E_FuelStorage_S_US_01.et" {
+ ID "5282DCB5DFC8538F"
+ components {
+  JOLP_PersistentCompositionComponent "{664B13B0A1000291}" {
+  }
+ }
+}

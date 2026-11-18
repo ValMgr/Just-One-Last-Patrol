@@ -1,0 +1,25 @@
+SCR_ChimeraCharacter : "{647D72D0F96BF888}Prefabs/Characters/Factions/CIV/MEC/Character_MEC_Randomized.et" {
+ ID "664B13AF00000161"
+ components {
+  ActionsManagerComponent "{520EA1D2F659CE02}" {
+   ActionContexts {
+    UserActionContext "{520EA1D2F659CE17}" {
+     Radius 2
+    }
+   }
+   additionalActions {
+    JOLP_CivilianTalkUserAction "{664B13AF000001E0}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{664B13AF000001E1}" {
+      Name "Speak"
+     }
+     Duration 0
+     VisibilityRange 4
+     "Sort Priority" 200
+    }
+   }
+  }
+ }
+}

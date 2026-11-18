@@ -1,0 +1,45 @@
+GenericEntity : "{7649AC4689618998}Prefabs/Props/Military/Compositions/US/BuildingService_US.et" {
+ ID "F0DBA538AC2A0552"
+ components {
+  SCR_CampaignBuildingProviderComponent "{5EBCED04D0321687}" {
+   m_aAvailableTraits {
+    TRAIT_SERVICE TRAIT_FORTIFICATION THEME_MILITARY SERVICE_HQ
+   }
+  }
+  // Conflict FreeBuilding uses MilitaryBase consumer/generator. JOLP seeds Storage_Supplies
+  // but that stock is not visible to the MilitaryBase resource graph, so budget stays 0
+  // and CreateEntityOwner fails silently. Use ranged Storage consumers instead.
+  SCR_ResourceComponent "{5D7CC617AC1077DD}" {
+   m_aConsumers {
+    SCR_ResourceConsumer "{664B13B0A1000501}" {
+     m_sDebugName "JOLP FreeBuilding Consumer"
+     m_eResourceRights ALL
+     m_eGeneratorIdentifier DEFAULT
+     m_fResourceRange 150
+     m_fBuyMultiplier 1
+     m_bIsIgnoringItself 1
+     m_ContainerQueue SCR_ResourceConsumerContainerQueue "{664B13B0A1000505}" : "{9392B24C65E36594}Configs/Resources/Supplies/ContainerQueues/Consumer/Queue_Consumer_SupplyStorage.conf" {
+     }
+    }
+   }
+   m_aGenerators {
+    SCR_ResourceGenerator "{664B13B0A1000502}" {
+     m_sDebugName "JOLP FreeBuilding Generator"
+     m_eResourceRights ALL
+     m_eIdentifier DEFAULT
+     m_fResourceMultiplier 1
+     m_fStorageRange 150
+     m_bIsIgnoringItself 1
+     m_ContainerQueue SCR_ResourceGeneratorContainerQueue "{664B13B0A1000506}" : "{83D995994313866B}Configs/Resources/Supplies/ContainerQueues/Generator/Queue_Generator_SupplyStorage.conf" {
+     }
+     m_aActions {
+      SCR_ResourceGeneratorActionStore "{664B13B0A1000503}" {
+      }
+      SCR_ResourceGeneratorActionDropContainers "{664B13B0A1000504}" {
+      }
+     }
+    }
+   }
+  }
+ }
+}

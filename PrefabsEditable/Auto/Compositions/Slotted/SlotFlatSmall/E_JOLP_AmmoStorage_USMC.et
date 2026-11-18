@@ -1,0 +1,25 @@
+GenericEntity : "{1BED8F81D2FA2137}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatSmall/E_AmmoStorage_S_US_01.et" {
+ ID "5282DCB5DFC8538F"
+ components {
+  FactionAffiliationComponent "{5D06E95D3BF135DB}" {
+   "faction affiliation" "RHS_USAF"
+  }
+  JOLP_PersistentCompositionComponent "{664B13B0A1000071}" {
+  }
+  SCR_EditableEntityComponent "{5E588CA1750A5E42}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
+    Name "Ammo Storage"
+    IconSetName "Armory"
+    m_aAuthoredLabels {
+     FACTION_US ENTITYTYPE_COMPOSITION SLOT_FLAT_SMALL TRAIT_SERVICE TRAIT_ARSENAL SERVICE_ARMORY TRAIT_REARMING
+    }
+    m_EntityBudgetCost {
+     SCR_EntityBudgetValue "{5E5C73D179D1C5AD}" {
+      m_BudgetType CAMPAIGN
+      m_Value 150
+     }
+    }
+   }
+  }
+ }
+}

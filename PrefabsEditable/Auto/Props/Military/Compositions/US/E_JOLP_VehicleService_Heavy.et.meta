@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{664B13B0A1000441}PrefabsEditable/Auto/Props/Military/Compositions/US/E_JOLP_VehicleService_Heavy.et"
+ Configurations {
+  EntityTemplateResourceClass PC {
+  }
+  EntityTemplateResourceClass XBOX_ONE : PC {
+  }
+  EntityTemplateResourceClass XBOX_SERIES : PC {
+  }
+  EntityTemplateResourceClass PS4 : PC {
+  }
+  EntityTemplateResourceClass PS5 : PC {
+  }
+  EntityTemplateResourceClass HEADLESS : PC {
+  }
+ }
+}

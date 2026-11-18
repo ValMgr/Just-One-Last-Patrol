@@ -1,0 +1,19 @@
+MetaFileClass {
+ Name "{2B4F99DBC8BCB4BB}Configs/Loadouts/USAF/USMC/MEF/Loadout_USAF_MG.conf"
+ Configurations {
+  CONFResourceClass PC {
+  }
+  CONFResourceClass XBOX_ONE : PC {
+  }
+  CONFResourceClass XBOX_SERIES : PC {
+  }
+  CONFResourceClass PS4 : PC {
+  }
+  CONFResourceClass PS5 : PC {
+  }
+  CONFResourceClass HEADLESS : PC {
+  }
+  CONFResourceClass Xbox : PC {
+  }
+ }
+}

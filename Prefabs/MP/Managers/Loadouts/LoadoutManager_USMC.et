@@ -1,0 +1,20 @@
+SCR_LoadoutManager : "{AA4E7419A1FF65B0}Prefabs/MP/Managers/Loadouts/LoadoutManager_Base.et" {
+ ID "56B2B47708C4F23A"
+ m_aPlayerLoadouts {
+  SCR_FactionPlayerLoadout "{60D6AED1D630262F}" : "{7D089092FB6C978B}Configs/Loadouts/USAF/USMC/MEF/Loadout_USAF_GL.conf" {
+   m_sLoadoutName "Squad Leader"
+  }
+  SCR_FactionPlayerLoadout "{60D6AED1C5667A88}" : "{0C9BA30F15BD9776}Configs/Loadouts/USAF/USMC/MEF/Loadout_USAF_Rifleman.conf" {
+   m_sLoadoutName "Rifleman"
+  }
+  SCR_FactionPlayerLoadout "{60D6AED1D7D99389}" : "{A732EB4447EE71C5}Configs/Loadouts/USAF/USMC/MEF/Loadout_USAF_AR.conf" {
+   m_sLoadoutName "LMG"
+  }
+  SCR_FactionPlayerLoadout "{60D6AED1D31FB6E0}" : "{80A0104504C3F333}Configs/Loadouts/USAF/USMC/MEF/Loadout_USAF_Medic.conf" {
+   m_sLoadoutName "Medic"
+  }
+  SCR_FactionPlayerLoadout "{60D6AED1C892C4FC}" : "{605644D781CD83D5}Configs/Loadouts/USAF/USMC/MEF/Loadout_USAF_LAT.conf" {
+   m_sLoadoutName "HAT"
+  }
+ }
+}

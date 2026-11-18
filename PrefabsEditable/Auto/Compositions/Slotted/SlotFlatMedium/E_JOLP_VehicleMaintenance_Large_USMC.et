@@ -1,0 +1,15 @@
+GenericEntity : "{7AD06D9CF2672AC5}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatMedium/E_VehicleMaintenance_M_Conflict_US_01.et" {
+ ID "5282DCB5DFC8538F"
+ components {
+  SCR_EditableEntityComponent "{65ECD7E8A3F13C73}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
+    Name "Vehicle Maintenance (Large)"
+    m_aAuthoredLabels {
+     FACTION_US ENTITYTYPE_COMPOSITION SLOT_FLAT_MEDIUM SERVICE_VEHICLE_DEPOT_HEAVY SERVICE_REPAIR TRAIT_SERVICE
+    }
+   }
+  }
+  JOLP_PersistentCompositionComponent "{664B13B0A1000085}" {
+  }
+ }
+}

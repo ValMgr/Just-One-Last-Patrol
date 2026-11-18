@@ -1,0 +1,18 @@
+GenericEntity : "{D4DDD345A352E97B}Prefabs/Compositions/Slotted/SlotFlatSmall/Headquarters_S_US_01.et" {
+ ID "5282DCB5DFC8538F"
+ components {
+  Persistence "{664B13B0A1000054}" {
+  }
+  JOLP_SupplyIncomeComponent "{664B13AF00000108}" {
+   m_iSuppliesPerPeriod 0
+   m_bPreferProviderPool 0
+   m_iInitialSupplies 1000
+  }
+ }
+ {
+  GenericEntity : "{664B13B0A1000510}Prefabs/Compositions/Misc/SubCompositions/Tents/JOLP_Tent_CommandPost_US_01.et" {
+   ID "5D088D2F37FC42AB"
+   coords -1.472 0 1.213
+  }
+ }
+}

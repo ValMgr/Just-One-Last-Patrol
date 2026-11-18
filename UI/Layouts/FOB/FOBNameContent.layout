@@ -1,0 +1,33 @@
+VerticalLayoutWidgetClass {
+ Name "FOBName"
+ Slot LayoutSlot "{664B13AF00000169}" {
+ }
+ {
+  SizeLayoutWidgetClass "{664B13B0A1000725}" {
+   Name "NameSize"
+   Slot LayoutSlot "{664B13AF00000169}" {
+    Padding 0 8 0 0
+   }
+   HeightOverride 72
+   {
+    EditBoxWidgetClass "{664B13B0A1000726}" {
+     Name "NameInput"
+     Slot LayoutSlot "{664B13AF00000169}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+      Padding 12 8 12 8
+     }
+     Color 1 1 1 1
+     "Font Size" 22
+     "Use placeholder text" 1
+     "Placeholder text" "FOB name"
+     components {
+      EditBoxFilterComponent "{664B13B0A1000727}" {
+       m_iCharacterLimit 32
+      }
+     }
+    }
+   }
+  }
+ }
+}

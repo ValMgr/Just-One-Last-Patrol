@@ -1,0 +1,113 @@
+SCR_AIWorld SCR_AIWorld_Kunar : "{E2A016456BBC697D}Prefabs/SCR_AIWorld_Kunar.et" {
+ coords 290.463 41.118 3208.036
+}
+PerceptionManager PerceptionManager : "{028DAEAD63E056BE}Prefabs/World/Game/PerceptionManager.et" {
+ coords 2746.709 10 3131.541
+ angles 0 26 0
+}
+SCR_FactionManager FactionManager_Editor : "{4A188E44289B9A50}Prefabs/MP/Managers/Factions/FactionManager_Editor.et" {
+ coords 208.88 40.915 3138.153
+ Factions {
+  SCR_Faction "{56DEAC40D132400B}" {
+   m_aFriendlyFactionsIds {
+    "MEI"
+    "USSR"
+   }
+  }
+  SCR_Faction "{5CC8DE37E1FF0F7A}" {
+   m_bIsPlayable 1
+  }
+ }
+ m_bCanChangeFactionsPlayable 0
+}
+GenericEntity JOLP_MilicianManager1 : "{664B13AF00000045}Prefabs/Managers/JOLP_MilicianManager.et" {
+ components {
+  JOLP_MilicianManagerComponent "{664B13AF00000041}" {
+   m_Config JOLP_MilicianGarrisonConfig "{664B13AF00000042}" {
+    m_sFactionKey "MEI"
+    m_aSentryGroupPrefabs {
+     "{9BB41B28EB97A926}Prefabs/Groups/MEI/Group_MEI_SentryTeam.et"
+     "{BDBE43FE17B323D7}Prefabs/Groups/MEI/Group_MEI_FireTeam.et"
+     "{E4160FF3ED018519}Prefabs/Groups/MEI/Group_MEI_Team_LAT.et"
+    }
+    m_aPatrolGroupPrefabs {
+     "{DFC9AD6C43E608A7}Prefabs/Groups/MEI/Group_MEI_LightFireTeam.et"
+     "{C289D03E4F13A740}Prefabs/Groups/MEI/Group_MEI_RifleSquad.et"
+     "{D4E0EF34D4BC6BDB}Prefabs/Groups/MEI/Group_MEI_ReconTeam.et"
+     "{2F91C1FC6ADAB3D9}Prefabs/Groups/MEI/Group_MEI_Team_Suppress.et"
+     "{4AAF649CEA888EC6}Prefabs/Groups/MEI/Group_MEI_Team_AT.et"
+    }
+    m_aCheckpointGroupPrefabs {
+     "{BDBE43FE17B323D7}Prefabs/Groups/MEI/Group_MEI_FireTeam.et"
+    }
+    m_aReinforceGroupPrefabs {
+     "{C289D03E4F13A740}Prefabs/Groups/MEI/Group_MEI_RifleSquad.et"
+     "{2F91C1FC6ADAB3D9}Prefabs/Groups/MEI/Group_MEI_Team_Suppress.et"
+    }
+    m_aTransportVehiclePrefabs {
+     "{6B8DBBC5D4D86E5D}Prefabs/Vehicles/Wheeled/Ural4320/Ural4320_transport_covered_FIA_T_brown.et"
+     "{7D284EBA54991DC5}Prefabs/Vehicles/Wheeled/UAZ469/UAZ469_covered_FIA_T_brown.et"
+    }
+    m_aLightVehiclePrefabs {
+     "{0B4DEA8078B78A9B}Prefabs/Vehicles/Wheeled/UAZ469/UAZ469_PKM.et"
+     "{532B5F3CF8496E59}Prefabs/Vehicles/Wheeled/BRDM2/BRDM2_base.et"
+    }
+    m_aHeavyVehiclePrefabs +{
+     "{68A65EFA9B616798}Prefabs/Vehicles/Tracked/BMP1/BMP1_Desert.et"
+    }
+    m_rCrewmanPrefab "{F95AEA26749B12EC}Prefabs/Characters/Factions/IND/MEI/Character_MEI_Rifleman1.et"
+    m_rDriverPrefab "{950EDEC6C85F9DC2}Prefabs/Characters/Factions/IND/MEI/Character_MEI_Rifleman2.et"
+    m_rMortarCrewPrefab "{664B13AF00000220}Prefabs/Characters/Factions/IND/MEI/Character_MEI_MortarCrew.et"
+   }
+  }
+ }
+ coords 210.5 41.4 3155
+}
+GenericEntity JOLP_CivilianManager1 : "{664B13AF00000060}Prefabs/Managers/JOLP_CivilianManager.et" {
+ components {
+  JOLP_CivilianManagerComponent "{664B13AF00000062}" {
+   m_Config JOLP_CivilianConfig "{664B13AF00000063}" {
+    m_iVillageFoot 7
+    m_iTownFoot 13
+    m_iCityFoot 28
+    m_iCityVehicles 3
+    m_fStageVeryLowBelow 0
+    m_fStageLowBelow 5
+    m_fStageModerateBelow 15
+    m_fStageHighBelow 30
+    m_fReputationPerMilicianKill 0.1
+    m_fReputationPerGarrisonMan 0.05
+    m_fReputationIEDDefused 0.2
+   }
+  }
+ }
+ coords 214.5 41.4 3155
+}
+GenericEntity JOLP_IEDManager1 : "{664B13AF000000C1}Prefabs/Managers/JOLP_IEDManager.et" {
+ coords 218.5 41.4 3155
+}
+SCR_LoadoutManager : "{82A8AB9A73BF7364}Prefabs/MP/Managers/Loadouts/LoadoutManager_USMC.et" {
+ coords 202.218 40.906 3150.646
+ m_aPlayerLoadouts {
+  SCR_FactionPlayerLoadout "{60D6AED1D630262F}" {
+   m_sLoadoutResource "{71EAC81153F94B19}Prefabs/Characters/Factions/BLUFOR/RHS_USAF/RHS_USAF_USMC_MEF_D/Character_RHS_USAF_USMC_D_Sergeant.et"
+   m_sLoadoutImage "{CD3181F89ECC2724}UI/Textures/EditorPreviews/Characters/Factions/BLUFOR/RHS_USAF/RHS_USAF_USMC_MEF/D/Character_RHS_USAF_USMC_D_Sergeant.edds"
+  }
+  SCR_FactionPlayerLoadout "{60D6AED1C5667A88}" {
+   m_sLoadoutResource "{CA1F6BC4C3DD480F}Prefabs/Characters/Factions/BLUFOR/RHS_USAF/RHS_USAF_USMC_MEF_D/Character_RHS_USAF_USMC_D_Rifleman.et"
+   m_sLoadoutImage "{F98BA3EC02183E96}UI/Textures/EditorPreviews/Characters/Factions/BLUFOR/RHS_USAF/RHS_USAF_USMC_MEF/D/Character_RHS_USAF_USMC_D_Rifleman.edds"
+  }
+  SCR_FactionPlayerLoadout "{60D6AED1D7D99389}" {
+   m_sLoadoutResource "{2D26B388DAA9692D}Prefabs/Characters/Factions/BLUFOR/RHS_USAF/RHS_USAF_USMC_MEF_D/Character_RHS_USAF_USMC_D_MG.et"
+   m_sLoadoutImage "{43998E8CE329B332}UI/Textures/EditorPreviews/Characters/Factions/BLUFOR/RHS_USAF/RHS_USAF_USMC_MEF/D/Character_RHS_USAF_USMC_D_MG.edds"
+  }
+  SCR_FactionPlayerLoadout "{60D6AED1D31FB6E0}" {
+   m_sLoadoutResource "{9C326615DFA310A1}Prefabs/Characters/Factions/BLUFOR/RHS_USAF/RHS_USAF_USMC_MEF_D/Character_RHS_USAF_USMC_D_Medic.et"
+   m_sLoadoutImage "{01E6FDE0CE6A9A88}UI/Textures/EditorPreviews/Characters/Factions/BLUFOR/RHS_USAF/RHS_USAF_USMC_MEF/D/Character_RHS_USAF_USMC_D_Medic.edds"
+  }
+  SCR_FactionPlayerLoadout "{60D6AED1C892C4FC}" {
+   m_sLoadoutResource "{A7990453CD6F6394}Prefabs/Characters/Factions/BLUFOR/RHS_USAF/RHS_USAF_USMC_MEF_D/Character_RHS_USAF_USMC_D_AT.et"
+   m_sLoadoutImage "{6B24178AB1C81AB5}UI/Textures/EditorPreviews/Characters/Factions/BLUFOR/RHS_USAF/RHS_USAF_USMC_MEF/D/Character_RHS_USAF_USMC_D_AT.edds"
+  }
+ }
+}

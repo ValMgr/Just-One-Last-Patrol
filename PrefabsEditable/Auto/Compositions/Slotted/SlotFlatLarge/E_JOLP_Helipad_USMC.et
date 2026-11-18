@@ -1,0 +1,7 @@
+GenericEntity : "{D3DDB76548C16BDB}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatLarge/E_Helipad_L_Conflict_US_01.et" {
+ ID "5282DCB5DFC8538F"
+ components {
+  JOLP_PersistentCompositionComponent "{664B13B0A1000281}" {
+  }
+ }
+}

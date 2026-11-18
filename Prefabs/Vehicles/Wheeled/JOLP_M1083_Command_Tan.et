@@ -1,0 +1,30 @@
+Vehicle : "{888FFC71FC66385F}Prefabs/Vehicles/Wheeled/M1083/M1083_Command_Tan.et" {
+ ID "664B13B0A1000710"
+ components {
+  ActionsManagerComponent "{C97BE5489221AE18}" {
+   ActionContexts {
+    UserActionContext "{664B13B0A1000712}" {
+     ContextName "JOLP_DeployFOB"
+     Position PointInfo "{664B13B0A1000713}" {
+      Offset 0 1.2 0
+     }
+     Radius 6
+     Omnidirectional 1
+    }
+   }
+   additionalActions {
+    JOLP_DeployFOBUserAction "{664B13B0A1000714}" {
+     ParentContextList {
+      "JOLP_DeployFOB"
+     }
+     UIInfo UIInfo "{664B13B0A1000715}" {
+      Name "Establish FOB"
+     }
+     Duration 0
+     VisibilityRange 6
+     "Sort Priority" 200
+    }
+   }
+  }
+ }
+}

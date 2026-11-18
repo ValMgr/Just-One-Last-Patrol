@@ -1,0 +1,16 @@
+GenericEntity {
+ ID "664B13AF00000040"
+ components {
+  Persistence "{664B13B0A1000052}" {
+  }
+  JOLP_FOBControllerComponent "{664B13AF00000042}" {
+   m_sName "FOB"
+   m_fSuppressionRadius 400
+  }
+  RplComponent "{664B13AF00000043}" {
+  }
+  Hierarchy "{664B13AF00000044}" {
+  }
+ }
+ Flags 1027
+}

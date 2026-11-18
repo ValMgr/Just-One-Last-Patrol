@@ -1,0 +1,20 @@
+GenericEntity : "{664B13AF00000001}Prefabs/Controllers/JOLP_LocationController.et" {
+ ID "664B13AF00000030"
+ components {
+  JOLP_LocationControllerComponent "{664B13AF00000011}" {
+   m_sName "Hideout"
+   m_eType HIDEOUT
+   m_fActivationRadius 150
+   m_iInitialGarrison 40
+   m_fActiveGarrisonRatio 0.5
+   m_bAllowSentry 1
+   m_bAllowPatrol 0
+   m_bAllowCheckpoint 0
+   m_bAllowReinforcement 0
+   m_iHideoutReinforceIntervalMs -1
+   m_iHideoutReinforceGroupSize -1
+   m_fHideoutReinforceSearchRange 2500
+   m_iHideoutDefenseReserve 4
+  }
+ }
+}

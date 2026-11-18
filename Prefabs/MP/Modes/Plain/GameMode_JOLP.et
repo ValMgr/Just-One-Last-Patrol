@@ -1,0 +1,48 @@
+JOLP_JustOneLastPatrolGameMode : "{0F307326459A1395}Prefabs/MP/Modes/GameMode_Base.et" {
+ ID "56B2B479C6B96951"
+ components {
+  Persistence "{65B27918147B3DEC}" {
+  }
+  JOLP_PersistenceManagerComponent "{664B13B0A1000053}" {
+  }
+  JOLP_LoadoutManagerComponent "{664B13B0A1000801}" {
+  }
+  SCR_GameModeHealthSettings "{5A22E11F9ACBB1DF}" {
+   m_bPermitUnconsciousVON 1
+  }
+  SCR_RespawnBriefingComponent "{66514620E815DD4D}" {
+  }
+  SCR_RespawnSystemComponent "{56B2B4793051E7C9}" {
+   components {
+    SCR_FreeSpawnHandlerComponent "{5CD2860C681CE021}" {
+    }
+    SCR_PossessSpawnHandlerComponent "{5CD2D12697D089D4}" {
+    }
+    SCR_SpawnPointSpawnHandlerComponent "{5CD2D126957998DF}" {
+    }
+   }
+   m_SpawnLogic SCR_MenuSpawnLogic "{665146208A2D5D53}" {
+   }
+  }
+  SCR_RespawnTimerComponent "{66514620F30CC75C}" {
+  }
+  JOLP_LocationManagerComponent "{664B13AF00000020}" {
+  }
+  JOLP_GameMasterComponent "{664B13AF00000090}" {
+  }
+  SCR_CampaignBuildingManagerComponent "{664B13AF00000150}" {
+   m_sFreeRoamBuildingClientTrigger "{5E191CEAF4B95816}Prefabs/MP/FreeRoamBuildingClientTrigger.et"
+   m_BudgetType CAMPAIGN
+   m_iCompositionRefundPercentage 100
+   m_iXpRewardTreshold 5
+   m_iInitialRewardInterval 5
+   m_fRewardCurveIncrement 0.2
+   // m_OutlineManager rejected as Unknown keyword when outline manager class is modded;
+   // JOLP_CampaignBuildingManagerOutlineFix creates it in script via new + JOLP_InitDefaultLayouts.
+   m_sPrefabsToBuildResource "{664B13AF00000120}Configs/Building/JOLP_Compositions_FreeRoamBuilding.conf"
+   m_sPrefabToHoldSupplyOnRefund "{4BBE0A784C01900E}Prefabs/Props/Military/SupplyBox/SupplyCrate/SupplyCrate_01/SupplyCrate_01_FreeRoamBuilding.et"
+  }
+ }
+ m_bUseSpawnPreload 0
+ PlayerControllerPrefab "{664B13AF00000142}Prefabs/Characters/Core/JOLP_PlayerController.et"
+}

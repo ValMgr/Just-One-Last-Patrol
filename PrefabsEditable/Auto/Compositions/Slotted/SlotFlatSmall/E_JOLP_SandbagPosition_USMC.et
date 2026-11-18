@@ -1,0 +1,15 @@
+GenericEntity : "{31DBF7E7C9D70576}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatSmall/E_SandbagPosition_S_US_03.et" {
+ ID "5282DCB5DFC8538F"
+ components {
+  SCR_EditableEntityComponent "{5DC704E50C318104}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
+    Name "Sandbag Position"
+    m_aAuthoredLabels {
+     FACTION_US ENTITYTYPE_COMPOSITION SLOT_FLAT_SMALL TRAIT_FORTIFICATION
+    }
+   }
+  }
+  JOLP_PersistentCompositionComponent "{664B13B0A1000077}" {
+  }
+ }
+}

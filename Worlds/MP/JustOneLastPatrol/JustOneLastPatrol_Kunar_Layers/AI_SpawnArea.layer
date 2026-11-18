@@ -1,0 +1,710 @@
+$grp GenericEntity : "{664B13AF00000001}Prefabs/Controllers/JOLP_LocationController.et" {
+ Abad_Gulz {
+  components {
+   Persistence "{6AC2E766FA101C52}" {
+   }
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "Abad_Gulz"
+    m_eType TOWN
+    m_eSettlementSize CITY
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3525.941 20.001 3768.365
+ }
+ Abad_Nangalam {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "Abad_Nangalam"
+    m_eType TOWN
+    m_eSettlementSize CITY
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2053.542 20.372 3651.759
+ }
+ Abad_Kunar {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "Abad_Kunar"
+    m_eType TOWN
+    m_eSettlementSize CITY
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3126.546 9.335 2740.621
+ }
+ op_oldsokolovka {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "op_oldsokolovka"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3701.365 32.31 3819.809
+ }
+ FOBBlessing {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "FOBBlessing"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2285.93 34.635 3797.168
+ }
+ village_durkalay {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_durkalay"
+    m_eType TOWN
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2888.398 40.418 3722.297
+ }
+ village_gurkalay {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_gurkalay"
+    m_eType TOWN
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1800.387 16.453 3849.526
+ }
+ op_oldsoviet {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "op_oldsoviet"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1194.441 88.846 3874.101
+ }
+ village_ravendak {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_ravendak"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 480.715 324.124 3880.679
+ }
+ village_shakar {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_shakar"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 339.813 89.097 3620.226
+ }
+ mine_Kharbash {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "mine_Kharbash"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3838.204 28 3361.277
+ }
+ village_khandarabad {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_khandarabad"
+    m_eType TOWN
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1375.161 40.477 3348.037
+ }
+ village_pazrak {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_pazrak"
+    m_eType TOWN
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3528.213 20 3220.996
+ }
+ FOBMichigan {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "FOBMichigan"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2728.537 20.699 3071.08
+ }
+ village_tantil {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_tantil"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2136.873 20.347 3041.091
+ }
+ op_khandar {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "op_khandar"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1459.679 104.218 3108.981
+ }
+ firebase_khan {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "firebase_khan"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1385.037 143.736 3042.813
+ }
+ village_richahlam {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_richahlam"
+    m_eType TOWN
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 749.288 40.714 3208.055
+ }
+ FOBThunderbolt {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "FOBThunderbolt"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 257.671 42.333 3165.379
+ }
+ op_eaglesnest {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "op_eaglesnest"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 943.128 192.986 2859.46
+ }
+ village_SafiDarah {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_SafiDarah"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 854.706 126.393 2568.976
+ }
+ village_shankalay {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_shankalay"
+    m_eType TOWN
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3843.358 6.824 2623.335
+ }
+ village_torkelay {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_torkelay"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2879.896 23.151 2396.256
+ }
+ village_sontantil {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_sontantil"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1626.793 229.539 2432.318
+ }
+ village_tangalai {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_tangalai"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 324.944 155.126 2205.925
+ }
+ firebase_vegas {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "firebase_vegas"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2713.09 108.374 1966.701
+ }
+ village_Cham {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_Cham"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3802.74 129.735 1783.018
+ }
+ cop_korengal {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "cop_korengal"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2359.029 163.5 1855.854
+ }
+ village_SalarBan {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_SalarBan"
+    m_eType TOWN
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3549.568 200 1539.998
+ }
+ village_kandlay {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_kandlay"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2799.92 170 1483.989
+ }
+ village_aliabad {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_aliabad"
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2158.033 138.377 1482.623
+ }
+ village_KharkaDahy {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_KharkaDahy"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3808.253 230 1023.085
+ }
+ village_chichal {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_chichal"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 2873.076 383.538 741.071
+ }
+ village_Jharnok {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_Jharnok"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3684.662 280 408.65
+ }
+ village_GulahyShal {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_GulahyShal"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 3368.669 309.84 379.57
+ }
+ op_restrepo {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "op_restrepo"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1899.601 209.538 1352.187
+ }
+ village_tora {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_tora"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1416.125 300 2048.654
+ }
+ cop_phoenix {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "cop_phoenix"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1028.817 290 1844.743
+ }
+ village_ashat {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_ashat"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1145.243 237.753 948.632
+ }
+ op_dallas {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "op_dallas"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1765.748 214.159 805.354
+ }
+ village_khunbar {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "village_khunbar"
+    m_eType TOWN
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 1987.391 200 315.502
+ }
+ cop_viper {
+  components {
+   JOLP_LocationControllerComponent "{664B13AF00000011}" {
+    m_sName "cop_viper"
+    m_eType OP
+    m_eSettlementSize VILLAGE
+    m_fActivationRadius 250
+    m_iInitialGarrison 12
+    m_fActiveGarrisonRatio 0.75
+    m_bAllowSentry 1
+    m_bAllowPatrol 1
+    m_bAllowCheckpoint 1
+    m_bAllowReinforcement 1
+   }
+  }
+  coords 447.784 354.331 311.93
+ }
+}

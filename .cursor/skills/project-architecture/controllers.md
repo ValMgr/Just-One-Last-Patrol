@@ -1,0 +1,546 @@
+# Controller Components
+
+Complete guide for Controller component pattern in JustOneLastPatrol mod.
+
+---
+
+## Overview
+
+Controller components manage individual entity instances (bases, towns, camps, etc.). Unlike managers (singletons), controllers are instantiated multiple times - one per entity.
+
+**Key characteristics:**
+- Multiple instances (not singletons)
+- Manage specific entity state
+- Register with manager in constructor
+- Replicate state to clients as needed
+- Persist entity-specific data via a `ScriptedComponentSerializer`
+
+---
+
+## Basic Controller Pattern
+
+### Structure
+
+```cpp
+class JOLP_TownControllerComponentClass: JOLP_ComponentClass {};
+
+class JOLP_TownControllerComponent: JOLP_Component
+{
+    // Protected parameters (editor-configurable)
+    [Attribute("0", desc: "Town ID")]
+    protected int m_iTownId;
+
+    [Attribute("", desc: "Town name")]
+    protected string m_sTownName;
+
+    // Runtime state
+    protected int m_iFactionId;
+    protected int m_iPopulation;
+
+    // Constructor - register with manager
+    void JOLP_TownControllerComponent(IEntityComponentSource src, IEntity ent, IEntity parent)
+    {
+        // Register on both client and server
+        JOLP_TownManagerComponent manager = JOLP_Global.GetTowns();
+        if (manager)
+        {
+            manager.RegisterTown(this);
+        }
+    }
+
+    // Init may be called by manager if needed
+    void Init(IEntity owner)
+    {
+        // Controller initialization
+        // Not always called - don't rely on it
+    }
+
+    // Cleanup on destroy
+    void ~JOLP_TownControllerComponent()
+    {
+        // Unregister from manager
+        JOLP_TownManagerComponent manager = JOLP_Global.GetTowns();
+        if (manager)
+        {
+            manager.UnregisterTown(this);
+        }
+    }
+
+    // Getters and setters for parameters
+    int GetTownId() { return m_iTownId; }
+    void SetTownId(int townId) { m_iTownId = townId; }
+
+    string GetTownName() { return m_sTownName; }
+    void SetTownName(string name) { m_sTownName = name; }
+
+    int GetFactionId() { return m_iFactionId; }
+    void SetFactionId(int factionId)
+    {
+        m_iFactionId = factionId;
+        OnFactionChanged();
+    }
+
+    protected void OnFactionChanged()
+    {
+        // Handle faction change
+        // Update visuals, notify other systems
+    }
+}
+```
+
+---
+
+## Registration Pattern
+
+### Constructor Registration (Recommended)
+
+**Modern pattern:** Register in constructor on both client and server
+
+```cpp
+void JOLP_SomeControllerComponent(IEntityComponentSource src, IEntity ent, IEntity parent)
+{
+    // Runs on both client and server
+    JOLP_SomeManagerComponent manager = JOLP_Global.GetSomeManager();
+    if (manager)
+    {
+        manager.RegisterController(this);
+    }
+}
+```
+
+### Legacy Registration (Deprecated)
+
+**Old pattern:** QueryEntitiesBySphere on startup
+
+❌ **Don't use for new controllers:**
+```cpp
+// OLD WAY - Don't do this anymore
+void FindControllers()
+{
+    array<IEntity> entities = new array<IEntity>();
+    GetGame().GetWorld().QueryEntitiesBySphere(
+        vector.Zero,
+        10000,
+        null,
+        null,
+        entities,
+        EQueryEntitiesFlags.DYNAMIC | EQueryEntitiesFlags.STATIC
+    );
+
+    foreach (IEntity entity : entities)
+    {
+        JOLP_SomeController controller = JOLP_SomeController.Cast(
+            entity.FindComponent(JOLP_SomeController)
+        );
+        if (controller)
+        {
+            RegisterController(controller);
+        }
+    }
+}
+```
+
+---
+
+## State Replication
+
+### Basic Replication
+
+```cpp
+class JOLP_BaseControllerComponent: JOLP_Component
+{
+    // Replicated values
+    [RplProp(onRplName: "OnFactionChanged")]
+    protected int m_iFactionId;
+
+    [RplProp(onRplName: "OnSuppliesChanged")]
+    protected int m_iSupplies;
+
+    // Non-replicated (server-only)
+    protected float m_fProductionRate;
+
+    // Server method to update faction
+    void SetFactionId(int factionId)
+    {
+        if (!Replication.IsServer()) return; // Server only
+
+        m_iFactionId = factionId;
+        Replication.BumpMe(); // Broadcast to clients
+    }
+
+    // Client callback when faction changes
+    protected void OnFactionChanged()
+    {
+        // Update client-side visuals
+        UpdateFactionFlag();
+        UpdateBaseColor();
+    }
+
+    // Server method to update supplies
+    void AddSupplies(int amount)
+    {
+        if (!Replication.IsServer()) return;
+
+        m_iSupplies += amount;
+        Replication.BumpMe();
+    }
+
+    // Client callback when supplies change
+    protected void OnSuppliesChanged()
+    {
+        // Update UI
+        UpdateSupplyDisplay();
+    }
+}
+```
+
+### Collection Replication via RPC
+
+```cpp
+class JOLP_BaseControllerComponent: JOLP_Component
+{
+    protected ref array<string> m_aDefenders;
+
+    // Server updates defenders
+    void UpdateDefenders(array<string> defenders)
+    {
+        if (!Replication.IsServer()) return;
+
+        m_aDefenders = defenders;
+
+        // Broadcast to clients via RPC
+        RpcDo_UpdateDefenders(defenders);
+    }
+
+    // Call directly on host, RPC on server
+    void RpcDo_UpdateDefenders(array<string> defenders)
+    {
+        Rpc(RpcDo_UpdateDefendersImpl, defenders);
+    }
+
+    [RplRpc(RplChannel.Reliable, RplRcver.Broadcast)]
+    protected void RpcDo_UpdateDefendersImpl(array<string> defenders)
+    {
+        m_aDefenders = defenders;
+        OnDefendersUpdated();
+    }
+
+    protected void OnDefendersUpdated()
+    {
+        // Update client UI
+    }
+}
+```
+
+---
+
+## Persistence
+
+### Controller Persistence Pattern
+
+A controller is a **per-instance** component, so its serializer is bound by a
+`ComponentClassPersistenceConfigRule { ComponentClass "JOLP_TownControllerComponent" }` in
+`Configs/Systems/Persistence/JustOneLastPatrol.conf` rather than on the game-mode entity.
+
+```cpp
+class JOLP_TownControllerSerializer : ScriptedComponentSerializer
+{
+    //! \return The component class this serializer is responsible for.
+    override static typename GetTargetType()
+    {
+        return JOLP_TownControllerComponent;
+    }
+
+    override protected ESerializeResult Serialize(notnull IEntity owner, notnull GenericComponent component, notnull SaveContext context)
+    {
+        JOLP_TownControllerComponent controller = JOLP_TownControllerComponent.Cast(component);
+        if (!controller)
+            return ESerializeResult.ERROR;
+
+        context.WriteValue("version", 1);
+
+        int townId = controller.GetTownId();
+        context.Write(townId);
+
+        int factionId = controller.GetFactionId();
+        context.Write(factionId);
+
+        int population = controller.GetPopulation();
+        context.Write(population);
+
+        // Position is NOT saved here - the entity's own transform handles it.
+        return ESerializeResult.OK;
+    }
+
+    override protected bool Deserialize(notnull IEntity owner, notnull GenericComponent component, notnull LoadContext context)
+    {
+        JOLP_TownControllerComponent controller = JOLP_TownControllerComponent.Cast(component);
+        if (!controller)
+            return false;
+
+        int version;
+        context.ReadValue("version", version);
+        if (version < 1)
+            return true;
+
+        int townId, factionId, population;
+        context.Read(townId);
+        context.Read(factionId);
+        context.Read(population);
+
+        controller.SetTownId(townId);
+        controller.SetFactionId(factionId);
+        controller.SetPopulation(population);
+
+        return true;
+    }
+}
+```
+
+⚠️ **If the entity is SPAWNED rather than authored in the world**, component state alone restores
+nothing: its persistence configuration needs `SelfSpawn` and the spawn site must call
+`JOLP_PersistenceTracking.Track(entity)`. `JOLP_BuildableComponentSerializer` is the shipped example.
+
+---
+
+## Lifecycle
+
+### Controller Lifecycle Flow
+
+1. **Creation:**
+   - Entity spawned or loaded from prefab
+   - Constructor called (both client/server)
+   - Constructor registers with manager
+   - Manager may call Init() if needed
+
+2. **Runtime:**
+   - Controller manages entity state
+   - Replicates changes to clients
+   - Persists state via its serializer
+
+3. **Destruction:**
+   - Destructor called
+   - Unregister from manager
+   - Clean up resources
+
+### Example with Full Lifecycle
+
+```cpp
+class JOLP_CampControllerComponent: JOLP_Component
+{
+    protected int m_iCampId;
+    protected ref array<EntityID> m_aOccupants;
+
+    // 1. Construction
+    void JOLP_CampControllerComponent(IEntityComponentSource src, IEntity ent, IEntity parent)
+    {
+        Print("Camp controller constructed");
+
+        // Register with manager
+        JOLP_CampManagerComponent manager = JOLP_Global.GetCamps();
+        if (manager)
+        {
+            m_iCampId = manager.RegisterCamp(this);
+        }
+
+        // Initialize collections
+        m_aOccupants = new array<EntityID>();
+    }
+
+    // 2. Initialization (if manager calls it)
+    void Init(IEntity owner)
+    {
+        Print("Camp controller initialized");
+
+        // Additional setup if needed
+        SetupTriggers();
+    }
+
+    // 3. Runtime methods
+    void AddOccupant(IEntity occupant)
+    {
+        if (!occupant) return;
+
+        m_aOccupants.Insert(occupant.GetID());
+        OnOccupantsChanged();
+    }
+
+    // 4. Destruction
+    void ~JOLP_CampControllerComponent()
+    {
+        Print("Camp controller destroyed");
+
+        // Unregister from manager
+        JOLP_CampManagerComponent manager = JOLP_Global.GetCamps();
+        if (manager)
+        {
+            manager.UnregisterCamp(this);
+        }
+
+        // Clean up
+        m_aOccupants = null;
+    }
+}
+```
+
+---
+
+## Parameter Access Patterns
+
+### Protected Members with Getters/Setters
+
+**Best practice:** Keep members protected, expose via methods
+
+```cpp
+class JOLP_SomeControllerComponent: JOLP_Component
+{
+    // Protected - not directly accessible
+    [Attribute("0")]
+    protected int m_iValue;
+
+    [Attribute("")]
+    protected string m_sName;
+
+    // Public getters
+    int GetValue() { return m_iValue; }
+    string GetName() { return m_sName; }
+
+    // Public setters with validation
+    void SetValue(int value)
+    {
+        if (value < 0) return; // Validation
+
+        m_iValue = value;
+        OnValueChanged();
+    }
+
+    void SetName(string name)
+    {
+        if (name.IsEmpty()) return;
+
+        m_sName = name;
+    }
+
+    protected void OnValueChanged()
+    {
+        // Handle value change
+        // Update derived values
+        // Notify other systems
+    }
+}
+```
+
+---
+
+## Multiple Controllers on Same Entity
+
+### Composition Pattern
+
+Controllers can be composed - multiple controllers on same entity managing different aspects:
+
+```cpp
+// Base management controller
+class JOLP_BaseControllerComponent: JOLP_Component
+{
+    // Manages base ownership, faction, etc.
+}
+
+// Defense controller on same entity
+class JOLP_DefenseControllerComponent: JOLP_Component
+{
+    // Manages defense turrets, guards, etc.
+
+    void Init(IEntity owner)
+    {
+        // Get base controller on same entity
+        JOLP_BaseControllerComponent baseController = JOLP_BaseControllerComponent.Cast(
+            owner.FindComponent(JOLP_BaseControllerComponent)
+        );
+
+        if (baseController)
+        {
+            // Coordinate with base controller
+        }
+    }
+}
+
+// Economy controller on same entity
+class JOLP_BaseEconomyComponent: JOLP_Component
+{
+    // Manages resource production, storage, etc.
+}
+```
+
+---
+
+## Best Practices
+
+### ✅ DO:
+
+- **Register in constructor:** On both client and server
+- **Use protected members:** Expose via getters/setters
+- **Unregister in destructor:** Clean up manager references
+- **Replicate essential state:** Use RplProp for simple values
+- **Validate setters:** Check parameters before setting
+- **Check manager exists:** Manager may not be loaded yet
+- **Document lifecycle:** When constructor/Init/destructor are called
+- **Persist controller state:** Write a `ScriptedComponentSerializer` and register it in `JustOneLastPatrol.conf`
+
+### ❌ DON'T:
+
+- **Use QueryEntitiesBySphere:** Deprecated, register in constructor instead
+- **Assume Init() called:** May not be called by manager
+- **Store IEntity long-term:** Use EntityID instead
+- **Replicate arrays with RplProp:** Use RPC or JIP
+- **Forget to unregister:** Memory leak if manager keeps reference
+- **Public member variables:** Use getters/setters
+- **Skip validation:** Always validate in setters
+
+---
+
+## Testing Controllers
+
+### Manual Testing
+1. Spawn entity with controller
+2. Verify constructor called and registered
+3. Test getter/setter methods
+4. Verify state replication to clients
+5. Test persistence (save/load)
+6. Delete entity and verify unregistration
+
+### Multiple Instance Testing
+1. Spawn multiple entities
+2. Verify each has separate controller
+3. Test state changes don't affect others
+4. Verify all registered with manager
+
+---
+
+## Common Issues
+
+### Issue: Controller not registered
+**Cause:** Manager doesn't exist when constructor runs
+**Fix:** Check manager exists before registering, or use delayed registration
+
+### Issue: Init() never called
+**Cause:** Manager not calling Init()
+**Fix:** Don't rely on Init(), initialize in constructor or first method call
+
+### Issue: State not replicating
+**Cause:** Forgot Replication.BumpMe()
+**Fix:** Call Replication.BumpMe() after changing RplProp values
+
+### Issue: Memory leak
+**Cause:** Not unregistering from manager
+**Fix:** Add unregister call in destructor
+
+---
+
+## Related Resources
+
+- See `managers.md` for manager pattern
+- See `global-access.md` for accessing managers
+- See `enforcescript-patterns/component-patterns.md` for base patterns
+- See `enforcescript-patterns/networking.md` for replication
+- See `enforcescript-patterns/persistence.md` for vanilla persistence (⚠️ EPF retired 2026-08-02)
+- See main `SKILL.md` for overview

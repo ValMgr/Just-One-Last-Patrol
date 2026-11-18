@@ -1,0 +1,8 @@
+GenericEntity : "{C6E02BDC5852D558}Prefabs/Compositions/Misc/SubCompositions/Storage/Slotted/Shelter_Arsenal_US_01.et" {
+ ID "5282DCB5DFC8538F"
+ {
+  GenericEntity : "{664B13B0A10008C0}Prefabs/Props/Military/Arsenal/JOLP_ArsenalBox_Weapons.et" {
+   ID "5D371ACBE97B9E1F"
+  }
+ }
+}

@@ -1,0 +1,8 @@
+GenericEntity : "{A2D4DAC9EDE8BD6E}Prefabs/Compositions/Misc/SubCompositions/Fortifications/Sandbag_MG_USSR_01_NSV.et" {
+ ID "664B13AF00000311"
+ components {
+  JOLP_HideoutPieceComponent "{664B13AF00000312}" {
+   m_bWatchTurret 1
+  }
+ }
+}

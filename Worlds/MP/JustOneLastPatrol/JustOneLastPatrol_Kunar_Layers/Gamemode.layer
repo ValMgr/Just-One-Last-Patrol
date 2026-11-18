@@ -1,0 +1,4 @@
+JOLP_JustOneLastPatrolGameMode GameMode_JOLP1 : "{CB0D320098A7BB76}Prefabs/MP/Modes/Plain/GameMode_JOLP.et" {
+ coords 192.275 40 3135.647
+ m_bAllowFactionChange 0
+}

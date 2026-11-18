@@ -1,0 +1,721 @@
+# Common Pitfalls and Anti-Patterns
+
+Comprehensive guide to common mistakes and how to avoid them in EnforceScript development.
+
+---
+
+## Language-Specific Pitfalls
+
+### No Ternary Operators
+
+**The Problem:** EnforceScript does NOT support ternary operators.
+
+❌ **Don't do this:**
+```cpp
+int value = condition ? 10 : 20; // COMPILE ERROR!
+string text = isActive ? "Active" : "Inactive"; // WON'T WORK!
+```
+
+✅ **Do this instead:**
+```cpp
+int value;
+if (condition)
+{
+    value = 10;
+}
+else
+{
+    value = 20;
+}
+
+string text;
+if (isActive)
+{
+    text = "Active";
+}
+else
+{
+    text = "Inactive";
+}
+```
+
+**Why:** EnforceScript parser doesn't recognize ternary operator syntax. Always use full if/else blocks.
+
+---
+
+## Memory Management Pitfalls
+
+### Forgot Strong Reference
+
+**The Problem:** Managed classes without `ref` keyword get garbage collected.
+
+❌ **Don't do this:**
+```cpp
+class JOLP_SomeComponent : JOLP_Component
+{
+    JOLP_SomeData m_Data; // No ref! Garbage collected!
+
+    void Init()
+    {
+        m_Data = new JOLP_SomeData();
+        m_Data.value = 100; // Works now...
+    }
+
+    void LaterMethod()
+    {
+        Print(m_Data.value); // CRASH! m_Data is null
+    }
+}
+```
+
+✅ **Do this instead:**
+```cpp
+class JOLP_SomeComponent : JOLP_Component
+{
+    ref JOLP_SomeData m_Data; // Strong ref!
+
+    void Init()
+    {
+        m_Data = new JOLP_SomeData();
+        m_Data.value = 100;
+    }
+
+    void LaterMethod()
+    {
+        Print(m_Data.value); // Works! m_Data persists
+    }
+}
+```
+
+**Why:** Managed classes are garbage collected at end of frame unless strong-referenced.
+
+### Missing ref in Collections
+
+**The Problem:** Forgot `ref` on collection or elements.
+
+❌ **Don't do this:**
+```cpp
+array<ref JOLP_SomeData> m_aData; // Collection not strong ref!
+ref array<JOLP_SomeData> m_aData; // Elements not strong ref!
+```
+
+✅ **Do this instead:**
+```cpp
+ref array<ref JOLP_SomeData> m_aData; // Both collection AND elements!
+ref map<int, ref JOLP_SomeData> m_mData; // Same for maps!
+```
+
+**Why:** Need strong ref for BOTH the collection AND the Managed class elements.
+
+---
+
+## Entity Reference Pitfalls
+
+### Storing IEntity Long-Term
+
+**The Problem:** Entities can be deleted, making stored references invalid.
+
+❌ **Don't do this:**
+```cpp
+class JOLP_SomeComponent : JOLP_Component
+{
+    protected IEntity m_TargetEntity; // Can become invalid!
+
+    void SetTarget(IEntity target)
+    {
+        m_TargetEntity = target;
+    }
+
+    void UseTarget()
+    {
+        m_TargetEntity.DoSomething(); // CRASH if entity deleted!
+    }
+}
+```
+
+✅ **Do this instead:**
+```cpp
+class JOLP_SomeComponent : JOLP_Component
+{
+    protected EntityID m_TargetEntityId;
+
+    void SetTarget(IEntity target)
+    {
+        if (!target)
+        {
+            m_TargetEntityId = EntityID.INVALID;
+            return;
+        }
+        m_TargetEntityId = target.GetID();
+    }
+
+    void UseTarget()
+    {
+        IEntity target = GetGame().GetWorld().FindEntityByID(m_TargetEntityId);
+        if (!target) return; // Entity gone, safe to handle
+
+        target.DoSomething(); // Safe!
+    }
+}
+```
+
+**Why:** Entities can be deleted at any time. Store EntityID and fetch when needed, always checking existence.
+
+### Using EntityID Across Network
+
+**The Problem:** EntityID differs between server and client.
+
+❌ **Don't do this:**
+```cpp
+[RplRpc(RplChannel.Reliable, RplRcver.Broadcast)]
+void RpcDo_SetTarget(EntityID targetId) // Different on client/server!
+{
+    IEntity target = GetGame().GetWorld().FindEntityByID(targetId);
+    // Won't find entity on client!
+}
+```
+
+✅ **Do this instead:**
+```cpp
+[RplRpc(RplChannel.Reliable, RplRcver.Broadcast)]
+void RpcDo_SetTarget(RplId targetRplId) // Same on client/server!
+{
+    RplComponent rpl = RplComponent.Cast(Replication.FindItem(targetRplId));
+    if (!rpl) return;
+
+    IEntity target = rpl.GetEntity();
+    // Works on both client and server!
+}
+```
+
+**Why:** EntityID is locally assigned and differs between server/client. RplId is network-synchronized.
+
+---
+
+## Replication Pitfalls
+
+### Replicating Arrays/Maps with RplProp
+
+**The Problem:** RplProp doesn't support complex types.
+
+❌ **Don't do this:**
+```cpp
+[RplProp()]
+ref array<int> m_aValues; // Won't replicate!
+
+[RplProp()]
+ref JOLP_SomeData m_Data; // Won't replicate!
+```
+
+✅ **Do this instead:**
+```cpp
+// Use RPC for collections
+void UpdateValues(array<int> values)
+{
+    m_aValues = values;
+    Rpc(RpcDo_UpdateValues, values);
+}
+
+[RplRpc(RplChannel.Reliable, RplRcver.Broadcast)]
+void RpcDo_UpdateValues(array<int> values)
+{
+    m_aValues = values;
+}
+
+// Or use JIP for collections
+override bool RplSave(ScriptBitWriter writer)
+{
+    writer.WriteInt(m_aValues.Count());
+    foreach (int value : m_aValues)
+    {
+        writer.WriteInt(value);
+    }
+    return true;
+}
+
+override bool RplLoad(ScriptBitReader reader)
+{
+    int count;
+    reader.ReadInt(count);
+
+    m_aValues = new array<int>();
+    for (int i = 0; i < count; i++)
+    {
+        int value;
+        reader.ReadInt(value);
+        m_aValues.Insert(value);
+    }
+    return true;
+}
+```
+
+**Why:** RplProp only supports simple types (int, float, bool, short strings). Use RPC or JIP for complex data.
+
+### Forgetting Replication.BumpMe()
+
+**The Problem:** RplProp values don't update without BumpMe().
+
+❌ **Don't do this:**
+```cpp
+[RplProp()]
+protected int m_iValue;
+
+void SetValue(int value)
+{
+    m_iValue = value; // Forgot to broadcast!
+}
+```
+
+✅ **Do this instead:**
+```cpp
+[RplProp()]
+protected int m_iValue;
+
+void SetValue(int value)
+{
+    m_iValue = value;
+    Replication.BumpMe(); // Broadcast change!
+}
+```
+
+**Why:** Changing RplProp value doesn't automatically replicate. Must call Replication.BumpMe() to broadcast.
+
+### Replication Flooding
+
+**The Problem:** Too frequent replication updates flood network.
+
+❌ **Don't do this:**
+```cpp
+void UpdateEveryFrame(float value)
+{
+    m_fValue = value;
+    Replication.BumpMe(); // EVERY FRAME! Network flood!
+}
+```
+
+✅ **Do this instead:**
+```cpp
+protected float m_fLastReplicatedValue;
+
+void UpdateThrottled(float value)
+{
+    m_fValue = value;
+
+    // Only replicate significant changes
+    if (Math.AbsFloat(m_fValue - m_fLastReplicatedValue) > 0.1)
+    {
+        m_fLastReplicatedValue = m_fValue;
+        Replication.BumpMe();
+    }
+}
+```
+
+**Why:** Frequent replication floods network bandwidth. Throttle updates to significant changes only.
+
+---
+
+## RPC Pitfalls
+
+### Wrong RPC Direction
+
+**The Problem:** Using wrong receiver for RPC direction.
+
+❌ **Don't do this:**
+```cpp
+// Trying to send client→server with Broadcast
+[RplRpc(RplChannel.Reliable, RplRcver.Broadcast)] // Wrong!
+void RpcAsk_ServerAction()
+{
+    // This sends to all clients, not server!
+}
+```
+
+✅ **Do this instead:**
+```cpp
+// Client→Server: Use Server receiver
+[RplRpc(RplChannel.Reliable, RplRcver.Server)]
+void RpcAsk_ServerAction()
+{
+    // Correctly sends to server
+}
+
+// Server→Client: Use Broadcast or Owner
+[RplRpc(RplChannel.Reliable, RplRcver.Broadcast)]
+void RpcDo_ClientAction()
+{
+    // Correctly sends to all clients
+}
+```
+
+**Why:** Receiver type determines RPC direction. Server for client→server, Broadcast/Owner for server→client.
+
+### Forgetting Host Check
+
+**The Problem:** Unnecessary RPC when server is also client (host).
+
+❌ **Don't do this:**
+```cpp
+void RequestAction()
+{
+    Rpc(RpcAsk_Action); // Always RPC, even on host!
+}
+
+[RplRpc(RplChannel.Reliable, RplRcver.Server)]
+void RpcAsk_Action()
+{
+    // Process action
+}
+```
+
+✅ **Do this instead:**
+```cpp
+void RequestAction()
+{
+    if (Replication.IsServer())
+    {
+        RpcAsk_Action(); // Direct call on host
+    }
+    else
+    {
+        Rpc(RpcAsk_Action); // RPC from client
+    }
+}
+
+[RplRpc(RplChannel.Reliable, RplRcver.Server)]
+void RpcAsk_Action()
+{
+    // Process action
+}
+```
+
+**Why:** When server is host (also a client), avoid unnecessary RPC by calling directly.
+
+### Client Not Owner
+
+**The Problem:** Client trying to RPC on entity they don't own.
+
+❌ **Don't do this:**
+```cpp
+void ClientRequestAction()
+{
+    // Try to RPC on some other player's controller
+    JOLP_JustOneLastPatrolController otherController = GetSomeOtherController();
+    otherController.DoSomething(); // Won't work! Not owner!
+}
+```
+
+✅ **Do this instead:**
+```cpp
+void ClientRequestAction()
+{
+    // Only RPC on OWN controller
+    JOLP_JustOneLastPatrolController myController = JOLP_Global.GetController();
+    if (!myController) return;
+
+    myController.DoSomething(); // Works! We own this!
+}
+```
+
+**Why:** Client can only send RPC on entities they own (their controller). Use server for inter-player communication.
+
+---
+
+## Persistence Pitfalls
+
+### Persisting IEntity
+
+**The Problem:** Trying to save IEntity reference directly.
+
+❌ **Don't do this:**
+```cpp
+override protected ESerializeResult Serialize(notnull IEntity owner, notnull GenericComponent component, notnull SaveContext context)
+{
+    IEntity referenced = someComponent.GetEntity();
+    context.Write(referenced);   // Will crash or corrupt the save!
+}
+```
+
+✅ **Do this instead — persist a stable id and re-resolve on load:**
+```cpp
+override protected ESerializeResult Serialize(notnull IEntity owner, notnull GenericComponent component, notnull SaveContext context)
+{
+    context.WriteValue("version", 1);
+
+    // A persistent id the system itself can resolve, or your own stable key -
+    // never a raw IEntity and never an EntityID across a save boundary.
+    string referencedId = someComponent.GetReferencedPersistentId();
+    context.Write(referencedId);
+
+    return ESerializeResult.OK;
+}
+
+override protected bool Deserialize(notnull IEntity owner, notnull GenericComponent component, notnull LoadContext context)
+{
+    int version;
+    context.ReadValue("version", version);
+    if (version < 1)
+        return true;
+
+    string referencedId;
+    context.Read(referencedId);
+
+    someComponent.SetReferencedPersistentId(referencedId);  // resolve later, may not exist yet
+    return true;
+}
+```
+
+**Why:** `IEntity` cannot be serialized. **`EntityID` is also wrong across a save** — it is a session-local handle, so an id saved in one session means nothing in the next. Persist a stable key (or the persistence system's own `UUID` via `GetId()`) and resolve the entity after load, tolerating "not there".
+
+### ⚠️ Writing EPF-shaped Persistence Code
+
+**The Problem:** EPF was retired on 2026-08-02, but stale examples still circulate.
+
+❌ **Don't do this — none of these types exist any more:**
+```cpp
+#ifndef PLATFORM_CONSOLE
+
+[EPF_ComponentSaveDataType(JOLP_SomeComponent)]
+class JOLP_SomeSaveDataClass : EPF_ComponentSaveDataClass {};
+
+class JOLP_SomeSaveData : EPF_ComponentSaveData
+{
+    override void ReadFrom(JOLP_SomeComponent component) { }
+    override void ApplyTo(JOLP_SomeComponent component)  { }
+}
+
+#endif
+```
+
+✅ **Do this instead:**
+```cpp
+class JOLP_SomeComponentSerializer : ScriptedComponentSerializer
+{
+    override static typename GetTargetType() { return JOLP_SomeComponent; }
+
+    override protected ESerializeResult Serialize(notnull IEntity owner, notnull GenericComponent component, notnull SaveContext context) { }
+    override protected bool Deserialize(notnull IEntity owner, notnull GenericComponent component, notnull LoadContext context) { }
+}
+```
+...plus an entry in `Configs/Systems/Persistence/JustOneLastPatrol.conf` — **a serializer that is not listed there is silently never called.**
+
+**Why:** `Scripts/` has zero `EPF_` references and neither EPF nor EDF is a mod dependency. **No console guards:** the vanilla system handles console storage internally; `#ifdef PLATFORM_CONSOLE` was an EPF-only requirement. See `persistence.md`.
+
+---
+
+## Component Pitfalls
+
+### Expecting Init() to be Called Automatically
+
+**The Problem:** Assuming Init() is called by engine.
+
+❌ **Don't do this:**
+```cpp
+class JOLP_SomeManagerComponent : JOLP_Component
+{
+    ref array<int> m_aValues;
+
+    void Init(IEntity owner)
+    {
+        m_aValues = new array<int>(); // Won't be called!
+    }
+
+    void DoSomething()
+    {
+        m_aValues.Insert(5); // CRASH! Array is null!
+    }
+}
+```
+
+✅ **Do this instead:**
+```cpp
+class JOLP_SomeManagerComponent : JOLP_Component
+{
+    ref array<int> m_aValues = new array<int>(); // Initialize in declaration
+
+    void Init(IEntity owner)
+    {
+        // Init() only called if game mode explicitly calls it
+        // Don't rely on it for critical initialization
+    }
+
+    static JOLP_SomeManagerComponent GetInstance()
+    {
+        if (!s_Instance)
+        {
+            BaseGameMode pGameMode = GetGame().GetGameMode();
+            if (pGameMode)
+            {
+                s_Instance = JOLP_SomeManagerComponent.Cast(
+                    pGameMode.FindComponent(JOLP_SomeManagerComponent)
+                );
+
+                // Call Init() manually if needed
+                if (s_Instance)
+                {
+                    s_Instance.Init(pGameMode);
+                }
+            }
+        }
+        return s_Instance;
+    }
+}
+```
+
+**Why:** Init() is not automatically called by engine. Either initialize in declaration or call manually.
+
+### Not Checking GetInstance() for Null
+
+**The Problem:** Assuming singleton always exists.
+
+❌ **Don't do this:**
+```cpp
+void DoSomething()
+{
+    JOLP_SomeManager.GetInstance().DoAction(); // May crash if null!
+}
+```
+
+✅ **Do this instead:**
+```cpp
+void DoSomething()
+{
+    JOLP_SomeManager manager = JOLP_SomeManager.GetInstance();
+    if (!manager) return; // Safe handling
+
+    manager.DoAction();
+}
+```
+
+**Why:** GetInstance() may return null if game mode not loaded or component not attached.
+
+---
+
+## UI Pitfalls
+
+### Not Checking GetUI()
+
+**The Problem:** Trying to access UI on server.
+
+❌ **Don't do this:**
+```cpp
+void ShowUI()
+{
+    JOLP_Global.GetUI().ShowContext(JOLP_SomeContext); // Crash on dedicated server!
+}
+```
+
+✅ **Do this instead:**
+```cpp
+void ShowUI()
+{
+    JOLP_UIManagerComponent ui = JOLP_Global.GetUI();
+    if (!ui) return; // No UI on server
+
+    ui.ShowContext(JOLP_SomeContext);
+}
+```
+
+**Why:** Dedicated servers don't have UI manager. Always check GetUI() returns non-null.
+
+### Widget Memory Leaks
+
+**The Problem:** Not removing dynamically created widgets.
+
+❌ **Don't do this:**
+```cpp
+override void OnShow()
+{
+    // Create widgets
+    for (int i = 0; i < 10; i++)
+    {
+        Widget item = GetGame().GetWorkspace().CreateWidgets(...);
+    }
+    // Never removed! Memory leak!
+}
+```
+
+✅ **Do this instead:**
+```cpp
+ref array<Widget> m_aCreatedWidgets;
+
+override void OnShow()
+{
+    m_aCreatedWidgets = new array<Widget>();
+
+    for (int i = 0; i < 10; i++)
+    {
+        Widget item = GetGame().GetWorkspace().CreateWidgets(...);
+        m_aCreatedWidgets.Insert(item);
+    }
+}
+
+override void OnHide()
+{
+    foreach (Widget widget : m_aCreatedWidgets)
+    {
+        widget.RemoveFromHierarchy();
+    }
+    m_aCreatedWidgets.Clear();
+}
+```
+
+**Why:** Dynamically created widgets must be explicitly removed to prevent memory leaks.
+
+---
+
+## Testing Pitfalls
+
+### Not Testing on Dedicated Server
+
+**The Problem:** Code works in editor/host but fails on dedicated server.
+
+**Common causes:**
+- UI code without GetUI() check
+- Client-side assumptions in server code
+- Missing Replication.IsServer() checks
+
+**Fix:** Always test on dedicated server build, not just editor/host.
+
+### Not Testing Late-Join
+
+**The Problem:** JIP replication not implemented or broken.
+
+**Symptoms:**
+- First players work fine
+- Late-joining players have missing/broken state
+
+**Fix:** Test with one client joining late after game state established.
+
+---
+
+## Checklist for Common Pitfalls
+
+Before committing code, verify:
+
+- [ ] No ternary operators used
+- [ ] All Managed classes have `ref` keyword
+- [ ] Arrays/maps have `ref` for both collection and elements
+- [ ] EntityID stored instead of IEntity long-term
+- [ ] RplId used for network entity references
+- [ ] RplProp only used for simple types
+- [ ] Replication.BumpMe() called after RplProp changes
+- [ ] RPC has correct receiver type (Server vs Broadcast/Owner)
+- [ ] Host check before client→server RPC
+- [ ] Persistence uses `ScriptedComponentSerializer` (no `EPF_*` types, no console guards) and every serializer is listed in `JustOneLastPatrol.conf`
+- [ ] IEntity not persisted in SaveData
+- [ ] GetInstance() results checked for null
+- [ ] GetUI() checked before UI operations
+- [ ] Dynamically created widgets removed
+- [ ] Tested on dedicated server
+- [ ] Tested with late-joining clients
+
+---
+
+## Related Resources
+
+- See `component-patterns.md` for component lifecycle
+- See `networking.md` for replication patterns
+- See `persistence.md` for save/load patterns
+- See `memory-management.md` for strong refs
+- See `ui-patterns.md` for UI context patterns
+- See main `SKILL.md` for overview

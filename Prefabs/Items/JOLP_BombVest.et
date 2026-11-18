@@ -1,0 +1,9 @@
+GenericEntity : "{28EB26F4063F2BC4}Prefabs/Weapons/Explosives/MortarBomb/Bomb_vest.et" {
+ ID "664B13AF00000093"
+ components {
+  BaseLoadoutClothComponent "{64E29C756BE74F61}" {
+   AreaType LoadoutVestArea "{664B13AF00000094}" {
+   }
+  }
+ }
+}

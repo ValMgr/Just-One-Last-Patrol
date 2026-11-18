@@ -1,0 +1,17 @@
+GenericEntity {
+ ID "664B13AF00000061"
+ components {
+  JOLP_CivilianManagerComponent "{664B13AF00000062}" {
+   m_Config JOLP_CivilianConfig "{664B13AF00000063}" : "{664B13AF00000080}Configs/Civilians/CivilianPopulation.conf" {
+   }
+   m_SkillConfig JOLP_AISkillConfig "{664B13AF00000172}" : "{664B13AF00000170}Configs/AI/AISkill.conf" {
+   }
+  }
+  RplComponent "{664B13AF00000064}" {
+  }
+  Hierarchy "{664B13AF00000065}" {
+  }
+ }
+ Flags 1027
+ coords 0 0 0
+}

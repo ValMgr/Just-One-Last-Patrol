@@ -1,0 +1,17 @@
+GenericEntity {
+ ID "664B13AF000000C6"
+ components {
+  Persistence "{664B13B0A1000051}" {
+  }
+  JOLP_IEDManagerComponent "{664B13AF000000C2}" {
+   m_Config JOLP_IEDConfig "{664B13AF000000C3}" : "{664B13AF000000C0}Configs/IED/IED.conf" {
+   }
+  }
+  RplComponent "{664B13AF000000C4}" {
+  }
+  Hierarchy "{664B13AF000000C5}" {
+  }
+ }
+ Flags 1027
+ coords 0 0 0
+}

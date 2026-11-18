@@ -1,0 +1,7 @@
+SCR_SpawnPoint USMC_SpawnPoint : "{69D81D4A5FB98F58}Prefabs/MP/Spawning/SpawnPoint_USMC_CP.et" {
+ coords 293.836 40 3173.387
+ m_fRandomSpawnRadius 10
+ m_Info SCR_UIInfo "{56B4CC4ECACA2C37}" {
+  Name "FOB Thunderbolt"
+ }
+}

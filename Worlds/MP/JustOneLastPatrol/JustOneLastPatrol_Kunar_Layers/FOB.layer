@@ -1,0 +1,95 @@
+GenericEntity FOB_Thunderbolt_Suppress : "{664B13AF00000041}Prefabs/Controllers/JOLP_FOBController.et" {
+ components {
+  JOLP_FOBControllerComponent "{664B13AF00000042}" {
+   m_sName "FOB_Thunderbolt"
+   m_fSuppressionRadius 300
+   m_bDeferRegistrationUntilArmed 0
+  }
+ }
+ coords 292.115 40 3192.747
+ angles 0 168.871 0
+}
+GenericEntity FOB_Thunderbolt : "{664B13AF00000106}Prefabs/Bases/JOLP_Headquarters_Thunderbolt.et" {
+ coords 292.115 40 3192.747
+ angles 0 168.871 0
+ {
+  GenericEntity {
+   ID "5D45393F6D84F038"
+   components {
+    SCR_ResourceComponent "{5D8AA552F85C2FBB}" {
+     m_aContainers {
+      SCR_ResourceContainerVirtual "{5D8AA552C6324D54}" {
+       m_bEnableResourceGain 1
+      }
+     }
+    }
+   }
+  }
+  GenericEntity {
+   ID "5D088D2F37FC42AB"
+   {
+    GenericEntity {
+     ID "5D371AC8D914191C"
+    }
+   }
+  }
+ }
+}
+GenericEntity : "{664B13B0A1000210}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatSmall/E_JOLP_SupplyProduction_USMC.et" {
+ components {
+  FactionAffiliationComponent "{62EC970D6C589E1D}" {
+   "faction affiliation" "RHS_USAF"
+  }
+  JOLP_SupplyIncomeComponent "{664B13AF00000112}" {
+   m_iSuppliesPerPeriod 10
+   m_eTimeUnit MINUTE
+  }
+ }
+ coords 278.742 40 3189.803
+ angles 0 167.98 0
+}
+GenericEntity : "{664B13B0A1000220}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatSmall/E_JOLP_AmmoStorage_USMC.et" {
+ components {
+  FactionAffiliationComponent "{5D06E95D3BF135DB}" {
+   "faction affiliation" "RHS_USAF"
+  }
+ }
+ coords 269.314 40 3172.271
+ angles 0 166.236 0
+}
+GenericEntity : "{664B13B0A1000230}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatSmall/E_JOLP_VehicleMaintenance_USMC.et" {
+ components {
+  FactionAffiliationComponent "{6306825580CCB98D}" {
+   "faction affiliation" "RHS_USAF"
+  }
+ }
+ coords 311.041 40 3200.739
+ angles 0 79.992 0
+}
+GenericEntity : "{664B13B0A1000240}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatMedium/E_JOLP_VehicleMaintenance_Large_USMC.et" {
+ components {
+  FactionAffiliationComponent "{6304EACBB08AD52C}" {
+   "faction affiliation" "RHS_USAF"
+  }
+ }
+ coords 342.069 40.032 3202.01
+ angles 0 -9.664 0
+}
+GenericEntity : "{664B13B0A1000280}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatLarge/E_JOLP_Helipad_USMC.et" {
+ components {
+  FactionAffiliationComponent "{65A6D31400C9C7FA}" {
+   "faction affiliation" "RHS_USAF"
+  }
+ }
+ coords 253.011 40.053 3149.48
+ angles 0 -11.226 0
+}
+GenericEntity : "{664B13B0A1000290}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatSmall/E_JOLP_FuelStorage_USMC.et" {
+ components {
+  FactionAffiliationComponent "{5D06E95D0B27AEF9}" {
+   "faction affiliation" "RHS_USAF"
+  }
+ }
+ coords 304.482 40 3163.433
+ angles 0 -101.658 0
+}

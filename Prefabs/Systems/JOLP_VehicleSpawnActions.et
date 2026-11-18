@@ -1,0 +1,94 @@
+GenericEntity {
+ ID "664B13B0A1000300"
+ components {
+  Hierarchy "{664B13B0A1000304}" {
+   Enabled 1
+  }
+  ActionsManagerComponent "{664B13B0A1000303}" {
+   ActionContexts {
+    UserActionContext "{664B13B0A1000302}" {
+     ContextName "JOLP_VehicleSpawn"
+     Position PointInfo "{664B13B0A1000305}" {
+      Offset 0 1.2 0
+     }
+     Radius 8
+     Omnidirectional 1
+    }
+   }
+   additionalActions {
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000310}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000311}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000312}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000313}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000314}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000315}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000316}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000317}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000318}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000319}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A100031A}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A100031B}" {
+     ParentContextList {
+      "JOLP_VehicleSpawn"
+     }
+     VisibilityRange 10
+    }
+   }
+  }
+ }
+}

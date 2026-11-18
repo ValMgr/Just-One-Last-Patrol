@@ -1,0 +1,7 @@
+GenericEntity : "{2660E3988DF90EBB}Prefabs/Props/Military/AmmoBoxes/FIA/EquipmentBoxWooden_Equipment_01_FIA.et" {
+ ID "664B13AF00000050"
+ components {
+  JOLP_HideoutHQComponent "{664B13AF00000052}" {
+  }
+ }
+}

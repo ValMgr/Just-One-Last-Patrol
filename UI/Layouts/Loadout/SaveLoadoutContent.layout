@@ -1,0 +1,33 @@
+VerticalLayoutWidgetClass {
+ Name "SaveLoadout"
+ Slot LayoutSlot "{664B13B0A1000886}" {
+ }
+ {
+  SizeLayoutWidgetClass "{664B13B0A1000887}" {
+   Name "NameSize"
+   Slot LayoutSlot "{664B13B0A1000888}" {
+    Padding 0 8 0 0
+   }
+   HeightOverride 48
+   {
+    EditBoxWidgetClass "{664B13B0A1000889}" {
+     Name "NameInput"
+     Slot LayoutSlot "{664B13B0A100088A}" {
+      HorizontalAlign 3
+      VerticalAlign 3
+      Padding 12 8 12 8
+     }
+     Color 1 1 1 1
+     "Font Size" 22
+     "Use placeholder text" 1
+     "Placeholder text" "Loadout name"
+     components {
+      EditBoxFilterComponent "{664B13B0A100088B}" {
+       m_iCharacterLimit 24
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,24 @@
+SCR_PlayerController : "{225E51284CC95CFA}Prefabs/Characters/Core/DefaultPlayerControllerMP.et" {
+ ID "664B13AF00000140"
+ components {
+  SCR_CampaignBuildingNetworkComponent "{664B13AF00000141}" {
+  }
+  JOLP_CivilianTalkNetworkComponent "{664B13AF00000166}" {
+  }
+  JOLP_FOBDeployNetworkComponent "{664B13B0A1000724}" {
+  }
+  JOLP_LoadoutNetworkComponent "{664B13B0A1000802}" {
+  }
+  JOLP_SelfRadialComponent "{664B13AF000001B2}" {
+  }
+  SCR_HUDManagerComponent "{2FDC275D9EBCDB8B}" {
+   InfoDisplays {
+    JOLP_SelfRadialDisplay "{664B13AF000001C2}" : "{2B36CB1A08905F22}Configs/HUD/RadialMenu/GlobalRadialMenuDisplay.conf" {
+     m_eLayer ALWAYS_TOP
+     m_bShowWhenCreated 0
+     m_eShow 127
+    }
+   }
+  }
+ }
+}

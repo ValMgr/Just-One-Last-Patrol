@@ -1,0 +1,24 @@
+GenericEntity : "{D4DDD345A352E97B}Prefabs/Compositions/Slotted/SlotFlatSmall/Headquarters_S_US_01.et" {
+ ID "664B13B0A1000700"
+ components {
+  JOLP_FOBControllerComponent "{664B13B0A1000701}" {
+   m_sName "FOB"
+   m_fSuppressionRadius 300
+   m_bDeferRegistrationUntilArmed 0
+  }
+  JOLP_SupplyIncomeComponent "{664B13B0A1000702}" {
+   m_iSuppliesPerPeriod 0
+   m_bPreferProviderPool 1
+   m_iInitialSupplies 1000
+   m_bExactInitialSupplies 1
+  }
+  JOLP_PersistentCompositionComponent "{664B13B0A1000703}" {
+  }
+ }
+ {
+  GenericEntity : "{664B13B0A1000510}Prefabs/Compositions/Misc/SubCompositions/Tents/JOLP_Tent_CommandPost_US_01.et" {
+   ID "664B13B0A1000704"
+   coords -1.472 0 1.213
+  }
+ }
+}

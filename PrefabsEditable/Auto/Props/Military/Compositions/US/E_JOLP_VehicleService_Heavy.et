@@ -1,0 +1,93 @@
+GenericEntity : "{BBB43CA8D41101AD}PrefabsEditable/Auto/Props/Military/Compositions/US/E_VehicleService_US_Medium.et" {
+ ID "F0DBA538AC2A0552"
+ components {
+  ActionsManagerComponent "{5CB6952C9693C41C}" {
+   additionalActions {
+    SCR_CampaignBuildingStartUserAction "{5ED5534E4E40397F}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     UIInfo SCR_ActionUIInfo "{5EF88B0BEE450043}" {
+      Name "#AR-Action_RequestVehicle"
+      m_sIconName "apcs"
+     }
+     VisibilityRange 10
+     Duration 0.5
+     m_sActionNameNoSupplies "#AR-Action_RequestVehicle_NoSupplies"
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000421}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000422}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000423}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000424}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000425}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000426}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000427}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000428}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A1000429}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A100042A}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A100042B}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+    SCR_CatalogSpawnerUserAction "{664B13B0A100042C}" {
+     ParentContextList {
+      "SCR_CatalogSpawnerUserAction"
+     }
+     VisibilityRange 10
+    }
+   }
+  }
+ }
+}

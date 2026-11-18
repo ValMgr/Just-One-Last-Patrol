@@ -1,0 +1,104 @@
+AudioClass {
+ sounds {
+  SoundClass {
+   id 1
+   name "SUICIDE"
+   tl 120 160
+   conns {
+    ConnectionsClass connections {
+     id 14
+     links {
+      ConnectionClass connection {
+       id 3
+       port 65
+      }
+     }
+    }
+   }
+   outState 2
+   outStatePort 79879
+  }
+ }
+ mixers {
+  MixerClass {
+   id 2
+   name "OutputState 14"
+   tl 460 80
+   res "{B764D803219C775E}Sounds/FinalMix.afm"
+   iops {
+    IOPConnectionClass iopConnection {
+     port 79879
+     conn {
+      ConnectionsClass connections {
+       id 5
+       links {
+        ConnectionClass connection {
+         id 1
+         port 65
+        }
+       }
+      }
+     }
+    }
+   }
+   path "{B764D803219C775E}Sounds/FinalMix.afm"
+   inputs {
+    "ANM_Footsteps" "ANM_Voice" "WPN_Handling" "WPN_Shots" "WPN_Explosions" "WNP_BulletHits" "CHAR" "ENV_Ambients" "VEH_Animations" "Impacts" "Dialogue" "Music" "ENV_Objects" "UI" "VEH_Engine" "VEH_Tires" "VON" "SFX" "ENV_Ambient_NoAtt" "SFX_Reverb" "VON_Reverb" "Dialogue_Reverb"
+   }
+  }
+ }
+ shaders {
+  ShaderClass {
+   id 3
+   name "Shader 1"
+   tl -240 160
+   conns {
+    ConnectionsClass connections {
+     id 0
+     links {
+      ConnectionClass connection {
+       id 5
+       port 65
+      }
+     }
+    }
+   }
+   iops {
+    IOPConnectionClass iopConnection {
+     port 1
+     conn {
+      ConnectionsClass connections {
+       id 15
+       links {
+        ConnectionClass connection {
+         id 4
+         port 65
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+ amplitudes {
+  AmplitudeClass : "{D6921F7062BE7960}Sounds/_SharedData/Configs/Amplitude/_SharedFolder/Amplitude_20m.conf" {
+   id 4
+   tl -560 160
+   parent "{D6921F7062BE7960}Sounds/_SharedData/Configs/Amplitude/_SharedFolder/Amplitude_20m.conf"
+  }
+ }
+ banks_local {
+  BankLocalClass {
+   id 5
+   name "Scream"
+   tl -580 80
+   Samples {
+    AudioBankSampleClass "Sample(1)" {
+     Filename "{4E2BE4E4E9D672FB}Sounds/Character/suicide_bomber.wav"
+    }
+   }
+  }
+ }
+ version 1
+}

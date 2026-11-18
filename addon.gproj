@@ -1,0 +1,33 @@
+GameProject {
+ ID "JustOneLastPatrol"
+ GUID "664B13AF6AA0E5C7"
+ TITLE "JustOneLastPatrol"
+ Dependencies {
+  "58D0FB3206B6F859" "5C9691EA7FD7A79F" "60B524F7A5AE96A8" "1337C0DE5DABBEEF" "BADC0DEDABBEDA5E" "595F2BF2F44836FB" "64CEC8E005828E5D" "65666CA764BB11E9" "62F364B35E9B51B0" "59BA048FA618471A" "5E389BB9F58B79A6" "629B2BA37EFFD577" "5C721177A220B42F" "5B02128D896F7DE8" "65B60A48AEC31157" "5D1880C4AD410C14" "5E524E4FEECCA92B" "5B383D4CB27E0D54" "6273146ADFE8241D" "64CB39E57377C861" "64900A5A31F5DCB5" "6A3E76326382FB6A" "60C4E0B49618CC62"
+ }
+ Configurations {
+  GameProjectConfig PC {
+   InputManagerSettings InputManagerSettings "{664B13AF000001A0}" {
+    Default "{664B13AF000001A1}Configs/System/chimeraInputCommon.conf"
+    UiMappings "{0AD37213EFEB0B61}Configs/System/chimeraMapping.conf"
+    HoldDuration 250
+    ClickDuration 250
+    DoubleClickDuration 250
+    RepeatInitialInterval 400
+    RepeatInterval 50
+   }
+  }
+  GameProjectConfig XBOX_ONE {
+  }
+  GameProjectConfig XBOX_SERIES {
+  }
+  GameProjectConfig PS4 {
+  }
+  GameProjectConfig PS5 {
+  }
+  GameProjectConfig HEADLESS {
+  }
+  GameProjectConfig Xbox {
+  }
+ }
+}

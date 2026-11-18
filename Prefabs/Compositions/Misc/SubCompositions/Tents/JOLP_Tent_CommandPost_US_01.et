@@ -1,0 +1,21 @@
+GenericEntity : "{F09296B9255F6704}Prefabs/Compositions/Misc/SubCompositions/Tents/Tent_CommandPost_US_01.et" {
+ ID "5282DCB5DFC8538F"
+ {
+  GenericEntity : "{664B13B0A1000500}Prefabs/Props/Military/Compositions/US/JOLP_BuildingService_US.et" {
+   ID "5D371AC8D914191C"
+   components {
+    Hierarchy "{5D64773789BE583D}" {
+     Enabled 1
+    }
+   }
+   coords 1.927 0.15 -5.116
+   angles 0 -32.681 0
+  }
+  GenericEntity : "{664B13B0A10008C4}Prefabs/Props/Military/Arsenal/AmmoBoxes/JOLP_AmmoBoxArsenal_HQ.et" {
+   ID "620EE6CFA1BF63F0"
+  }
+  GenericEntity : "{664B13B0A10008C5}Prefabs/Props/Military/Arsenal/AmmoBoxes/JOLP_AmmoBoxArsenal_Medical.et" {
+   ID "620EE6CFA1BF63A3"
+  }
+ }
+}

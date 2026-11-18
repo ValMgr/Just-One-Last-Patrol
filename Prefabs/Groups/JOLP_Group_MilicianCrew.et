@@ -1,0 +1,7 @@
+SCR_AIGroup : "{242BC3C6BCE96EA5}Prefabs/Groups/INDFOR/Group_FIA_Base.et" {
+ ID "664B13AF00000191"
+ m_faction "USSR"
+ m_aUnitPrefabSlots {
+ }
+ m_bDeleteIfNoPlayer 0
+}

@@ -1,0 +1,45 @@
+GenericEntity : "{94D9E9B690F98756}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatSmall/E_SupplyCache_S_US_01.et" {
+ ID "5282DCB5DFC8538F"
+ components {
+  SCR_EditableEntityComponent "{63088881A0AC04CF}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
+    Name "Supply Production"
+    IconSetName "SupplyDepot"
+    m_aAuthoredLabels {
+     FACTION_US ENTITYTYPE_COMPOSITION SLOT_FLAT_SMALL TRAIT_SERVICE TRAIT_SUPPLYSTORAGE_SMALL SERVICE_SUPPLY_STORAGE
+    }
+    m_EntityBudgetCost {
+     SCR_EntityBudgetValue "{63088885A202A988}" {
+      m_BudgetType CAMPAIGN
+      m_Value 200
+     }
+    }
+   }
+  }
+  JOLP_SupplyIncomeComponent "{664B13AF00000112}" {
+   m_iSuppliesPerPeriod 500
+   m_bPreferProviderPool 1
+   m_iInitialSupplies 0
+  }
+  JOLP_PersistentCompositionComponent "{664B13B0A1000061}" {
+  }
+  ActionsManagerComponent "{5D66ED1096104FD8}" {
+   additionalActions {
+    SCR_CampaignBuildingDisassemblyUserAction "{66F87AAA0DDFF5C3}" : "{F7AA2A810E22ADC8}Prefabs/Compositions/Slotted/Actions/FreeRoamBuilding_Action_Disassemble.conf" {
+    }
+    JOLP_ProduceSuppliesUserAction "{664B13B0A1000740}" {
+     ParentContextList {
+      "Disassembly"
+     }
+     UIInfo UIInfo "{664B13B0A1000741}" {
+      Name "Produce supplies"
+     }
+     VisibilityRange 10
+     Duration -5
+     PerformPerFrame 1
+     m_eShownInVehicleState NOT_IN_VEHICLE
+    }
+   }
+  }
+ }
+}

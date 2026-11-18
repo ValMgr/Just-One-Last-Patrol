@@ -1,0 +1,32 @@
+GenericEntity : "{A28E5D231A74D95D}Prefabs/Props/Military/Compositions/US/ArsenalBox_US_Equipment.et" {
+ ID "56F2C6D6F7C6DAFA"
+ components {
+  SCR_FactionAffiliationComponent "{5A50E7655452A21D}" {
+   "faction affiliation" "RHS_USAF"
+  }
+  ActionsManagerComponent "{56F2C6D1431ADB12}" {
+   additionalActions +{
+    JOLP_SaveLoadoutUserAction "{664B13B0A10008D4}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{664B13B0A10008D5}" {
+      Name "Save loadout"
+     }
+     Duration 0
+     "Sort Priority" 8
+    }
+    JOLP_OpenLoadoutsUserAction "{664B13B0A10008D6}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{664B13B0A10008D7}" {
+      Name "Loadouts"
+     }
+     Duration 0
+     "Sort Priority" 9
+    }
+   }
+  }
+ }
+}

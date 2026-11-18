@@ -1,0 +1,16 @@
+SCR_AIGroup : "{242BC3C6BCE96EA5}Prefabs/Groups/INDFOR/Group_FIA_Base.et" {
+ ID "664B13AF00000075"
+ components {
+  SCR_AIConfigComponent "{512CC1759AE69D6D}" {
+   m_Skill 0.45
+   m_EnableMovement 1
+   m_EnablePerception 1
+   m_EnableAttack 1
+  }
+ }
+ m_faction "CIV"
+ m_aUnitPrefabSlots {
+  "{664B13AF00000160}Prefabs/Characters/JOLP_Civilian.et"
+ }
+ m_bDeleteIfNoPlayer 0
+}

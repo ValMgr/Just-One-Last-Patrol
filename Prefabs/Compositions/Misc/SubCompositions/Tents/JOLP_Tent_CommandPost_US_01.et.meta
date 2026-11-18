@@ -1,0 +1,17 @@
+MetaFileClass {
+ Name "{664B13B0A1000510}Prefabs/Compositions/Misc/SubCompositions/Tents/JOLP_Tent_CommandPost_US_01.et"
+ Configurations {
+  EntityTemplateResourceClass PC {
+  }
+  EntityTemplateResourceClass XBOX_ONE : PC {
+  }
+  EntityTemplateResourceClass XBOX_SERIES : PC {
+  }
+  EntityTemplateResourceClass PS4 : PC {
+  }
+  EntityTemplateResourceClass PS5 : PC {
+  }
+  EntityTemplateResourceClass HEADLESS : PC {
+  }
+ }
+}

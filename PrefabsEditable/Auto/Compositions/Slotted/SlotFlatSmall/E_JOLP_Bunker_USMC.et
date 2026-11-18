@@ -1,0 +1,15 @@
+GenericEntity : "{E87F2E0B5C56A1C3}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatSmall/E_Bunker_S_US_01.et" {
+ ID "5282DCB5DFC8538F"
+ components {
+  SCR_EditableEntityComponent "{5DC704E553650249}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
+    Name "Bunker"
+    m_aAuthoredLabels {
+     FACTION_US ENTITYTYPE_COMPOSITION SLOT_FLAT_SMALL TRAIT_FORTIFICATION
+    }
+   }
+  }
+  JOLP_PersistentCompositionComponent "{664B13B0A1000075}" {
+  }
+ }
+}

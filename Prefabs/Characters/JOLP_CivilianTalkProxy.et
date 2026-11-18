@@ -1,0 +1,32 @@
+GenericEntity {
+ ID "664B13AF00000181"
+ components {
+  ActionsManagerComponent "{664B13AF00000182}" {
+   ActionContexts {
+    UserActionContext "{664B13AF00000183}" {
+     ContextName "Head"
+     Position PointInfo "{664B13AF00000184}" {
+     }
+     Radius 0.6
+    }
+   }
+   additionalActions {
+    JOLP_CivilianTalkUserAction "{664B13AF00000185}" {
+     ParentContextList {
+      "Head"
+     }
+     UIInfo UIInfo "{664B13AF00000186}" {
+      Name "Speak"
+     }
+     Duration 0
+     VisibilityRange 4
+     "Sort Priority" 200
+    }
+   }
+  }
+  RplComponent "{664B13AF00000187}" {
+   "Parent Node From Parent Entity" 1
+   Streamable Disabled
+  }
+ }
+}

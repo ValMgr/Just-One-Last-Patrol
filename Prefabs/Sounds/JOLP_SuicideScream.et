@@ -1,0 +1,12 @@
+GenericEntity {
+ ID "664B13AF000000A3"
+ components {
+  SimpleSoundComponent "{664B13AF000000A4}" {
+   Filenames {
+    "{664B13AF000000A1}Sounds/Character/suicide_bomber.acp"
+   }
+  }
+  RplComponent "{664B13AF000000A5}" {
+  }
+ }
+}

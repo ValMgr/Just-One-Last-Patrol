@@ -1,0 +1,38 @@
+GenericEntity : "{9771776551C306E0}PrefabsEditable/Auto/Compositions/Slotted/SlotFlatSmall/E_Headquarters_S_US_01.et" {
+ ID "5282DCB5DFC8538F"
+ components {
+  SCR_EditableEntityComponent "{620EE6CD9762B0DA}" {
+   m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
+    Name "Headquarters"
+    m_aAuthoredLabels {
+     FACTION_US ENTITYTYPE_COMPOSITION SLOT_FLAT_SMALL SERVICE_HQ TRAIT_SERVICE TRAIT_BASE TRAIT_MANAGEMENT_BASE TRAIT_SPAWNPOINT TRAIT_SUPPLYSTORAGE_SMALL
+    }
+    m_EntityBudgetCost {
+     SCR_EntityBudgetValue "{620EE6CD97412B00}" {
+      m_BudgetType CAMPAIGN
+      m_Value 500
+     }
+    }
+   }
+  }
+  SCR_EditorLinkComponent "{620EE6CE68F54F86}" {
+   m_aEntries {
+    SCR_EditorLinkEntry "{620EE6CE6896E81D}" {
+     m_Prefab "{664B13B0A1000510}Prefabs/Compositions/Misc/SubCompositions/Tents/JOLP_Tent_CommandPost_US_01.et"
+    }
+   }
+  }
+  JOLP_FOBControllerComponent "{664B13AF00000102}" {
+   m_sName "FOB"
+   m_fSuppressionRadius 300
+   m_bDeferRegistrationUntilArmed 1
+  }
+  JOLP_SupplyIncomeComponent "{664B13AF00000104}" {
+   m_iSuppliesPerPeriod 0
+   m_bPreferProviderPool 1
+   m_iInitialSupplies 1000
+  }
+  JOLP_PersistentCompositionComponent "{664B13B0A1000060}" {
+  }
+ }
+}

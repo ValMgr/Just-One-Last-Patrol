@@ -1,0 +1,25 @@
+GenericEntity {
+ ID "664B13AF00000010"
+ components {
+  JOLP_LocationControllerComponent "{664B13AF00000011}" {
+   m_sName "Location"
+   m_eType TOWN
+   m_eSettlementSize TOWN
+   m_iCivilianFootOverride -1
+   m_iCivilianVehicleOverride -1
+   m_fActivationRadius 400
+   m_iInitialGarrison 20
+   m_fActiveGarrisonRatio 0.65
+   m_iMaxActiveOverride -1
+   m_bAllowSentry 1
+   m_bAllowPatrol 1
+   m_bAllowCheckpoint 1
+   m_bAllowReinforcement 1
+  }
+  RplComponent "{664B13AF00000012}" {
+  }
+  Hierarchy "{664B13AF00000013}" {
+  }
+ }
+ Flags 1027
+}

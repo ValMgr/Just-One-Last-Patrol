@@ -1,0 +1,52 @@
+GenericEntity : "{5F76887813B86AD4}Prefabs/Props/Military/AmmoBoxes/EquipmentBoxStack/USSR/EquipmentBoxStack_USSR_01_V6_covered.et" {
+ ID "664B13AF00000301"
+ components {
+  JOLP_HideoutHQComponent "{664B13AF00000302}" {
+  }
+  RplComponent "{5476B36C54387F41}" {
+   Enabled 1
+  }
+ }
+ {
+  GenericEntity : "{160E4E4110803F26}Prefabs/Structures/Military/Flags/FlagPole_02/FlagPole_02_V1_FIA.et" {
+   ID "664B13AF00000303"
+   components {
+    Hierarchy "{664B13AF00000304}" {
+     Enabled 1
+    }
+   }
+   coords 2.6 0 1.2
+   angles 0 25 0
+  }
+  GenericEntity : "{82AB62F3269E79C3}Prefabs/Compositions/Misc/SubCompositions/Fortifications/Sandbag_Bunker_Camouflaged_FIA_01.et" {
+   ID "664B13AF00000305"
+   components {
+    Hierarchy "{664B13AF00000306}" {
+     Enabled 1
+    }
+   }
+   coords 0 0 3.4
+   angles 0 180 0
+  }
+  GenericEntity : "{32DE30B02A04B844}Prefabs/Compositions/Misc/SubCompositions/Fortifications/Sandbag_Corner_BarbedWire_USSR_01.et" {
+   ID "664B13AF00000307"
+   components {
+    Hierarchy "{664B13AF00000308}" {
+     Enabled 1
+    }
+   }
+   coords -2.6 0 -1.2
+   angles 0 40 0
+  }
+  GenericEntity : "{00B3E3FD05C85DBD}Prefabs/Structures/Military/CamoNets/FIA/CamoNet_Small_Top_FIA_01_V1.et" {
+   ID "664B13AF00000309"
+   components {
+    Hierarchy "{664B13AF0000030A}" {
+     Enabled 1
+    }
+   }
+   coords -0.6 0 -1.6
+   angles 0 15 0
+  }
+ }
+}

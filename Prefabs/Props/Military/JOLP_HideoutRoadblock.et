@@ -1,0 +1,7 @@
+GenericEntity : "{64C9C1D1C2C1B38D}Prefabs/Props/Infrastructure/Roadblocks/RoadBlock_01.et" {
+ ID "664B13AF00000317"
+ components {
+  JOLP_HideoutPieceComponent "{664B13AF00000318}" {
+  }
+ }
+}
