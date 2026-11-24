@@ -685,14 +685,21 @@ modded class SCR_CatalogEntitySpawnerComponent
 		}
 
 		EntitySpawnParams params = new EntitySpawnParams();
-		params.TransformMode = ETransformMode.WORLD;
-		owner.GetTransform(params.Transform);
+		params.TransformMode = ETransformMode.LOCAL;
+		params.Parent = owner;
+		params.Transform[0] = "1 0 0";
+		params.Transform[1] = "0 1 0";
+		params.Transform[2] = "0 0 1";
+		params.Transform[3] = "0 0 0";
 
 		IEntity carrier = GetGame().SpawnEntityPrefab(resource, owner.GetWorld(), params);
 		if (!carrier)
 			return null;
 
-		owner.AddChild(carrier, -1);
+		// RplComponent reads the parent during init. Spawn params Parent is unreliable
+		// for GenericEntity, so force the link if the engine dropped it.
+		if (carrier.GetParent() != owner)
+			owner.AddChild(carrier, -1);
 		carrier.SetName(VEHICLE_ACTIONS_NAME);
 		JOLP_PersistenceManagerComponent.UntrackTransient(carrier);
 		return carrier;
@@ -767,6 +774,13 @@ modded class SCR_EditorLinkComponent
 
 			m_aLinkedChildren.Set(i, swapped);
 			SCR_EntityHelper.DeleteEntityAndChildren(child);
+
+			// The parent link already fired OnLinkedEntitiesSpawned, which is what
+			// makes a depot load its vehicle list. The replacement was spawned after
+			// that event, so register it directly.
+			SCR_ServicePointComponent service = SCR_ServicePointComponent.Cast(swapped.FindComponent(SCR_ServicePointComponent));
+			if (service)
+				service.RegisterService();
 		}
 	}
 }

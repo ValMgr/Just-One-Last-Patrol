@@ -150,32 +150,33 @@ class JOLP_LoadoutNetworkComponent : ScriptComponent
 		string rejection = Gate(arsenalId, player, arsenal);
 		if (!rejection.IsEmpty())
 		{
-			Rpc(RpcDo_LoadoutDetail, false, rejection, string.Empty);
+			Rpc(RpcDo_LoadoutDetail, false, rejection, string.Empty, string.Empty);
 			return;
 		}
 
 		JOLP_LoadoutManagerComponent manager = JOLP_LoadoutManagerComponent.GetInstance();
 		if (!manager)
 		{
-			Rpc(RpcDo_LoadoutDetail, false, "Loadouts are not available.", string.Empty);
+			Rpc(RpcDo_LoadoutDetail, false, "Loadouts are not available.", string.Empty, string.Empty);
 			return;
 		}
 
 		PlayerController controller = PlayerController.Cast(GetOwner());
 		string text;
+		string cost;
 		string error;
-		bool described = manager.Describe(controller.GetPlayerId(), name, player, arsenal, text, error);
+		bool described = manager.Describe(controller.GetPlayerId(), name, player, arsenal, text, cost, error);
 		if (!described && error.IsEmpty())
 			error = "That loadout could not be priced.";
 
-		Rpc(RpcDo_LoadoutDetail, described, error, text);
+		Rpc(RpcDo_LoadoutDetail, described, error, text, cost);
 	}
 
 	//------------------------------------------------------------------------------------------------
 	[RplRpc(RplChannel.Reliable, RplRcver.Owner)]
-	protected void RpcDo_LoadoutDetail(bool ok, string message, string detail)
+	protected void RpcDo_LoadoutDetail(bool ok, string message, string detail, string cost)
 	{
-		JOLP_LoadoutsDialog.DeliverDetail(ok, message, detail);
+		JOLP_LoadoutsDialog.DeliverDetail(ok, message, detail, cost);
 	}
 
 	//------------------------------------------------------------------------------------------------

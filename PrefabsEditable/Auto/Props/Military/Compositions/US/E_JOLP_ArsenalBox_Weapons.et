@@ -1,0 +1,60 @@
+GenericEntity : "{B455DA2086A1C821}PrefabsEditable/Auto/Props/Military/Compositions/US/E_ArsenalBox_US_Weapons.et" {
+ ID "56F2C6D6F7C6DAFA"
+ components {
+  SCR_FactionAffiliationComponent "{5A50E7655452A21D}" {
+   "faction affiliation" "RHS_USAF"
+  }
+  ActionsManagerComponent "{56F2C6D1431ADB12}" {
+   additionalActions {
+    SCR_OpenStorageAction "{58EE8EA3E900BE40}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{58EE8EA3E5E7D64D}" {
+      Name "#AR-Inventory_OpenArsenalStorage"
+     }
+    }
+    SCR_SaveArsenalLoadout "{58EE8EA3E73F1F6A}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{58EE8EA3E1EA2E15}" {
+      Name "#AR-Loadout_Action_SaveLoadout"
+     }
+     Duration 1
+     "Sort Priority" 10
+    }
+    SCR_ResupplySelfSupportStationAction "{5E22CEC8BA1D1393}" : "{11F44ADB0B72715F}Configs/Actions/SupportStationActions/Resupply/ArsenalBox/ResupplyAction_HeldWeapon.conf" {
+    }
+    SCR_ResupplySelfSupportStationAction "{5E22CEC8B8EFB9D4}" : "{6CA483DDD400F6FA}Configs/Actions/SupportStationActions/Resupply/ArsenalBox/ResupplyAction_HeldUnderBarrel.conf" {
+    }
+    SCR_ResupplySelfSupportStationAction "{5E22CEC8A6B3812D}" : "{539BA03C501F3C63}Configs/Actions/SupportStationActions/Resupply/ArsenalBox/ResupplyAction_Grenade.conf" {
+    }
+    SCR_ResupplySelfSupportStationAction "{5E22CEC8A5C1BB2C}" : "{E976EE8F9F17FF15}Configs/Actions/SupportStationActions/Resupply/ArsenalBox/ResupplyAction_Morphine.conf" {
+    }
+    SCR_ResupplySelfSupportStationAction "{5E22CEC8A4F18CD6}" : "{367047A0B7C6A2B1}Configs/Actions/SupportStationActions/Resupply/ArsenalBox/ResupplyAction_Bandage.conf" {
+    }
+    JOLP_SaveLoadoutUserAction "{664B13B0A10008F0}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{664B13B0A10008F1}" {
+      Name "Save loadout"
+     }
+     Duration 0
+     "Sort Priority" 8
+    }
+    JOLP_OpenLoadoutsUserAction "{664B13B0A10008F2}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{664B13B0A10008F3}" {
+      Name "Loadouts"
+     }
+     Duration 0
+     "Sort Priority" 9
+    }
+   }
+  }
+ }
+}

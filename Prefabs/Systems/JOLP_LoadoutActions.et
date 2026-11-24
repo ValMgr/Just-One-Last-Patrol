@@ -1,0 +1,45 @@
+GenericEntity {
+ ID "664B13B0A10008E0"
+ components {
+  Hierarchy "{664B13B0A10008E1}" {
+   Enabled 1
+  }
+  ActionsManagerComponent "{664B13B0A10008E2}" {
+   Enabled 1
+   ActionContexts {
+    UserActionContext "{664B13B0A10008E3}" {
+     ContextName "default"
+     Position PointInfo "{664B13B0A10008E4}" {
+      Offset 0 0.464 0
+     }
+     Radius 2.5
+     Omnidirectional 1
+    }
+   }
+   additionalActions {
+    JOLP_SaveLoadoutUserAction "{664B13B0A10008E5}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{664B13B0A10008E6}" {
+      Name "Save loadout"
+     }
+     Duration 0
+     VisibilityRange 5
+     "Sort Priority" 8
+    }
+    JOLP_OpenLoadoutsUserAction "{664B13B0A10008E7}" {
+     ParentContextList {
+      "default"
+     }
+     UIInfo UIInfo "{664B13B0A10008E8}" {
+      Name "Loadouts"
+     }
+     Duration 0
+     VisibilityRange 5
+     "Sort Priority" 9
+    }
+   }
+  }
+ }
+}

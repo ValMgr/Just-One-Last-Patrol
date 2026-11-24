@@ -35,7 +35,9 @@ enum JOLP_MilicianGroupRole
 	CHECKPOINT = 2,
 	REINFORCEMENT = 3,
 	//! Crewed vehicle left in a settlement after drop-off, or fielded as local defense.
-	VEHICLE = 4
+	VEHICLE = 4,
+	//! One sharpshooter on a roof. Towns and cities only, and only when a standable perch exists.
+	SNIPER = 5
 }
 
 //------------------------------------------------------------------------------------------------

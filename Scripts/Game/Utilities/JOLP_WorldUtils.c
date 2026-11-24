@@ -1423,6 +1423,560 @@ class JOLP_WorldUtils : Managed
 		return true;
 	}
 
+	protected static ref array<IEntity> s_aTowerPriority;
+	protected static ref array<IEntity> s_aTowerOther;
+	protected static vector s_vTowerQueryCenter;
+	protected static float s_fTowerQueryRadius;
+
+	//------------------------------------------------------------------------------------------------
+	//! A flat roof, or a narrow tower ledge such as a minaret balcony.
+	//! The highest stand that clears the listed groups and players is used.
+	static bool FindElevatedStand(vector center, float radius, array<vector> avoid, float minSeparation, array<vector> players, float playerClearance, out vector position)
+	{
+		position = center;
+
+		BaseWorld world = GetGame().GetWorld();
+		if (!world)
+			return false;
+
+		if (radius < 20)
+			radius = 20;
+
+		array<vector> pads = {};
+		for (int i = 0; i < 40; i++)
+		{
+			float angle = Math.RandomFloat(0, Math.PI2);
+			float reach = Math.Sqrt(Math.RandomFloat(0, 1)) * radius;
+			vector sample = center + Vector(Math.Cos(angle) * reach, 0, Math.Sin(angle) * reach);
+			vector pad;
+			if (!ElevatedPad(world, sample, pad))
+				continue;
+
+			if (!ElevatedStandClear(pad, avoid, minSeparation, players, playerClearance))
+				continue;
+
+			pads.Insert(pad);
+		}
+
+		AppendTowerPads(world, center, radius, avoid, minSeparation, players, pads);
+
+		if (pads.IsEmpty())
+			return false;
+
+		vector best = pads[0];
+		for (int p = 1; p < pads.Count(); p++)
+		{
+			if (pads[p][1] > best[1])
+				best = pads[p];
+		}
+
+		position = best;
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static bool ElevatedStandClear(vector pad, array<vector> avoid, float minSeparation, array<vector> players, float playerClearance)
+	{
+		if (minSeparation > 0 && Clearance(pad, avoid) < minSeparation)
+			return false;
+
+		if (playerClearance > 0 && NearestFlatDistance(pad, players) < playerClearance)
+			return false;
+
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Towers are too narrow for the random roof samples. Their own entity is traced instead.
+	//! A minaret balcony may sit under the dome, so a ring below the tip is accepted.
+	protected static void AppendTowerPads(BaseWorld world, vector center, float radius, array<vector> avoid, float minSeparation, array<vector> players, notnull array<vector> pads)
+	{
+		if (!s_aTowerPriority)
+			s_aTowerPriority = new array<IEntity>();
+		else
+			s_aTowerPriority.Clear();
+
+		if (!s_aTowerOther)
+			s_aTowerOther = new array<IEntity>();
+		else
+			s_aTowerOther.Clear();
+
+		s_vTowerQueryCenter = center;
+		s_fTowerQueryRadius = radius;
+		world.QueryEntitiesBySphere(center, radius, CollectTowerEntity, null, EQueryEntitiesFlags.STATIC);
+
+		// Close enough that he does not appear in the street beside a player. Far closer than a roof may be.
+		float towerClearance = 40;
+
+		foreach (IEntity priority : s_aTowerPriority)
+		{
+			if (!priority)
+				continue;
+
+			vector origin = priority.GetOrigin();
+			TryTowerColumns(world, origin, 0, avoid, minSeparation, players, towerClearance, pads);
+			TryTowerColumns(world, origin, 2.5, avoid, minSeparation, players, towerClearance, pads);
+			TryTowerColumns(world, origin, 5, avoid, minSeparation, players, towerClearance, pads);
+		}
+
+		int traced = 0;
+		foreach (IEntity other : s_aTowerOther)
+		{
+			if (!other)
+				continue;
+
+			if (traced >= 120)
+				break;
+
+			traced++;
+			vector origin = other.GetOrigin();
+			vector pad;
+			if (!TowerPerch(world, origin[0], origin[2], origin, pad))
+				continue;
+
+			if (!ElevatedStandClear(pad, avoid, minSeparation, players, towerClearance))
+				continue;
+
+			pads.Insert(pad);
+		}
+
+		s_aTowerPriority.Clear();
+		s_aTowerOther.Clear();
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static bool CollectTowerEntity(IEntity entity)
+	{
+		if (!entity)
+			return true;
+
+		if (DistanceFlat(entity.GetOrigin(), s_vTowerQueryCenter) > s_fTowerQueryRadius)
+			return true;
+
+		if (IsVegetation(entity))
+			return true;
+
+		ResourceName prefabName = SCR_ResourceNameUtils.GetPrefabName(entity);
+		if (prefabName.IsEmpty())
+			return true;
+
+		string path = prefabName;
+		path.ToLower();
+		if (path.Contains("minaret") || path.Contains("minar") || path.Contains("mosque") || path.Contains("masjid") || path.Contains("tower") || path.Contains("spire"))
+		{
+			s_aTowerPriority.Insert(entity);
+			return true;
+		}
+
+		if (path.Contains("/props/") || path.Contains("vegetation") || path.Contains("/rock") || path.Contains("stone") || path.Contains("clutter"))
+			return true;
+
+		if (path.Contains("structure") || path.Contains("building") || path.Contains("house"))
+			s_aTowerOther.Insert(entity);
+
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static void TryTowerColumns(BaseWorld world, vector origin, float ring, array<vector> avoid, float minSeparation, array<vector> players, float playerClearance, notnull array<vector> pads)
+	{
+		int steps = 1;
+		if (ring > 0.1)
+			steps = 4;
+
+		for (int i = 0; i < steps; i++)
+		{
+			float angle = (i / (float)steps) * Math.PI2;
+			float x = origin[0] + (Math.Cos(angle) * ring);
+			float z = origin[2] + (Math.Sin(angle) * ring);
+			vector pad;
+			if (!TowerPerch(world, x, z, origin, pad))
+				continue;
+
+			if (!ElevatedStandClear(pad, avoid, minSeparation, players, playerClearance))
+				continue;
+
+			pads.Insert(pad);
+		}
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! The crown of a tower, or a ledge just under a dome. False when the column is only a house.
+	//! hub is the tower entity, so a balcony stand is pulled in off the outer lip.
+	protected static bool TowerPerch(BaseWorld world, float x, float z, vector hub, out vector pad)
+	{
+		pad = Vector(x, 0, z);
+
+		float terrainY = world.GetSurfaceY(x, z);
+		float peakY;
+		vector peakNormal;
+		IEntity peakEntity;
+		if (!TraceDownHit(world, Vector(x, 0, z), terrainY + 60, terrainY + 4, peakY, peakNormal, peakEntity))
+			return false;
+
+		if (peakY < terrainY + 8)
+			return false;
+
+		if (IsVegetation(peakEntity))
+			return false;
+
+		vector crown = Vector(x, peakY + 0.05, z);
+		if (peakNormal[1] >= 0.8 && TowerFooting(world, x, peakY, z) && !StandIsOnEdge(world, crown, hub))
+		{
+			pad = crown;
+			return true;
+		}
+
+		float bestY = -1;
+		vector best;
+		bool found = false;
+		for (int ring = 0; ring < 4; ring++)
+		{
+			float reach = 0.6 + (ring * 0.7);
+			for (int i = 0; i < 8; i++)
+			{
+				float angle = (i / 8.0) * Math.PI2;
+				float sx = x + (Math.Cos(angle) * reach);
+				float sz = z + (Math.Sin(angle) * reach);
+				float hitY;
+				vector normal;
+				IEntity hitEntity;
+				if (!TraceDownHit(world, Vector(sx, 0, sz), peakY + 2, peakY - 8, hitY, normal, hitEntity))
+					continue;
+
+				if (hitY > peakY - 0.5)
+					continue;
+
+				if (hitY < terrainY + 6)
+					continue;
+
+				// The balcony bowl is curved, so a lip-flat test rejects the walkable floor.
+				if (normal[1] < 0.5)
+					continue;
+
+				if (IsVegetation(hitEntity))
+					continue;
+
+				if (!TowerFooting(world, sx, hitY, sz))
+					continue;
+
+				vector candidate = Vector(sx, hitY + 0.05, sz);
+				if (!found)
+				{
+					bestY = hitY;
+					best = candidate;
+					found = true;
+					continue;
+				}
+
+				// A lower storey, or a much higher dome. Stay on this balcony.
+				if (hitY > bestY + 1.2 || hitY < bestY - 1.2)
+					continue;
+
+				// The raised outer lip used to win by being higher. Keep the side nearer the shaft.
+				if (DistanceFlat(candidate, hub) < DistanceFlat(best, hub))
+				{
+					bestY = hitY;
+					best = candidate;
+				}
+			}
+		}
+
+		if (!found)
+			return false;
+
+		if (!StandIsOnEdge(world, best, hub))
+		{
+			pad = best;
+			return true;
+		}
+
+		vector pulled;
+		if (!PullOffTheLip(world, best, hub, pulled))
+			return false;
+
+		pad = pulled;
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! True when the drop is right beside the stand. A roof with floor all around is not an edge.
+	protected static bool StandIsOnEdge(BaseWorld world, vector stand, vector hub)
+	{
+		int solid = 0;
+		for (int i = 0; i < 6; i++)
+		{
+			float angle = (i / 6.0) * Math.PI2;
+			float sx = stand[0] + (Math.Cos(angle) * 0.75);
+			float sz = stand[2] + (Math.Sin(angle) * 0.75);
+			if (!SameFloor(world, stand, sx, sz, 0.55, 0.65, 0.4))
+				continue;
+
+			solid++;
+		}
+
+		// A real roof has floor all around. A balcony lip does not, even when the rim is wide.
+		if (solid >= 5)
+			return false;
+
+		vector shaft;
+		if (!ShaftAim(world, stand, hub, shaft))
+			return true;
+
+		float dx = stand[0] - shaft[0];
+		float dz = stand[2] - shaft[2];
+		float dist = Math.Sqrt((dx * dx) + (dz * dz));
+		if (dist < 0.3)
+			return false;
+
+		float scale = 0.75 / dist;
+		float ox = stand[0] + (dx * scale);
+		float oz = stand[2] + (dz * scale);
+		// A rise is the lip behind him. Only a drop beside his feet is the edge.
+		return !SameFloor(world, stand, ox, oz, 0.9, 0.5, 1.2);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Leave the outer lip and stop on the balcony floor, short of the shaft.
+	protected static bool PullOffTheLip(BaseWorld world, vector stand, vector hub, out vector pad)
+	{
+		pad = stand;
+
+		vector shaft;
+		if (!ShaftAim(world, stand, hub, shaft))
+			return false;
+
+		float dx = shaft[0] - stand[0];
+		float dz = shaft[2] - stand[2];
+		float dist = Math.Sqrt((dx * dx) + (dz * dz));
+		if (dist < 1.0)
+			return false;
+
+		float originY = stand[1];
+		vector kept = stand;
+		bool placed = false;
+		int misses = 0;
+		float moved = 0;
+		float step = 0.25;
+		while (moved + step <= 1.7 && moved + step < dist - 0.45)
+		{
+			moved = moved + step;
+			float scale = moved / dist;
+			float sx = stand[0] + (dx * scale);
+			float sz = stand[2] + (dz * scale);
+			float hitY;
+			vector normal;
+			IEntity hitEntity;
+			if (!TraceDownHit(world, Vector(sx, 0, sz), originY + 1.5, originY - 2.0, hitY, normal, hitEntity))
+			{
+				misses++;
+				if (misses >= 3)
+					break;
+
+				continue;
+			}
+
+			if (IsVegetation(hitEntity) || normal[1] < 0.5 || hitY > originY + 0.35 || hitY < originY - 1.6)
+			{
+				misses++;
+				if (misses >= 3)
+					break;
+
+				continue;
+			}
+
+			if (!TowerFooting(world, sx, hitY, sz))
+			{
+				if (placed)
+					break;
+
+				misses++;
+				if (misses >= 3)
+					break;
+
+				continue;
+			}
+
+			misses = 0;
+			if (moved < 0.75)
+				continue;
+
+			vector candidate = Vector(sx, hitY + 0.05, sz);
+			if (StandIsOnEdge(world, candidate, hub))
+				continue;
+
+			kept = candidate;
+			placed = true;
+		}
+
+		if (!placed)
+			return false;
+
+		pad = kept;
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Chest-height wall toward the tower. The entity pivot is used when the ray hits it.
+	protected static bool ShaftAim(BaseWorld world, vector stand, vector hub, out vector shaft)
+	{
+		shaft = hub;
+
+		vector chest = stand;
+		chest[1] = stand[1] + 0.9;
+		float towardHub;
+		if (WallDistanceToward(world, chest, hub, 4.0, towardHub))
+			return true;
+
+		float best = 5;
+		bool found = false;
+		for (int i = 0; i < 8; i++)
+		{
+			float angle = (i / 8.0) * Math.PI2;
+			vector aim = chest + Vector(Math.Cos(angle) * 4, 0, Math.Sin(angle) * 4);
+			float hitDist;
+			if (!WallDistance(world, chest, aim, hitDist))
+				continue;
+
+			if (hitDist < 0.35 || hitDist >= best)
+				continue;
+
+			best = hitDist;
+			shaft = stand + Vector(Math.Cos(angle) * (hitDist + 0.3), 0, Math.Sin(angle) * (hitDist + 0.3));
+			shaft[1] = stand[1];
+			found = true;
+		}
+
+		return found;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static bool SameFloor(BaseWorld world, vector stand, float x, float z, float drop, float minNormalY, float rise)
+	{
+		float hitY;
+		vector normal;
+		IEntity hitEntity;
+		if (!TraceDownHit(world, Vector(x, 0, z), stand[1] + 1.5, stand[1] - 1.6, hitY, normal, hitEntity))
+			return false;
+
+		if (IsVegetation(hitEntity))
+			return false;
+
+		if (normal[1] < minNormalY)
+			return false;
+
+		if (hitY > stand[1] + rise || hitY < stand[1] - drop)
+			return false;
+
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static bool WallDistanceToward(BaseWorld world, vector from, vector hub, float reach, out float hitDist)
+	{
+		hitDist = 0;
+
+		vector flatHub = hub;
+		flatHub[1] = from[1];
+		float dist = DistanceFlat(from, flatHub);
+		if (dist < 0.3)
+			return false;
+
+		float scale = reach / dist;
+		if (scale > 1)
+			scale = 1;
+
+		vector end = from;
+		end[0] = from[0] + ((flatHub[0] - from[0]) * scale);
+		end[2] = from[2] + ((flatHub[2] - from[2]) * scale);
+		end[1] = from[1];
+		return WallDistance(world, from, end, hitDist);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static bool WallDistance(BaseWorld world, vector start, vector end, out float hitDist)
+	{
+		hitDist = 0;
+
+		TraceParam trace = new TraceParam();
+		trace.Flags = TraceFlags.WORLD | TraceFlags.ENTS;
+		trace.LayerMask = EPhysicsLayerDefs.Projectile;
+		trace.Start = start;
+		trace.End = end;
+
+		float coef = world.TraceMove(trace, null);
+		if (coef <= 0.02 || coef >= 1)
+			return false;
+
+		hitDist = vector.Distance(start, end) * coef;
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Headroom for a man on a balcony. A dome may sit close above the ledge.
+	protected static bool TowerFooting(BaseWorld world, float x, float hitY, float z)
+	{
+		vector stand = Vector(x, hitY, z);
+		return OverheadClear(stand, 1.05);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! First solid at least 3.5 m above the landscape, flat enough to stand, with headroom and a small level disk.
+	protected static bool ElevatedPad(BaseWorld world, vector sample, out vector pad)
+	{
+		pad = sample;
+
+		float terrainY = world.GetSurfaceY(sample[0], sample[2]);
+		float hitY;
+		vector normal;
+		IEntity hitEntity;
+		if (!TraceDownHit(world, sample, terrainY + 40, terrainY + 3, hitY, normal, hitEntity))
+			return false;
+
+		if (hitY < terrainY + 3.5)
+			return false;
+
+		if (hitY > terrainY + 40)
+			return false;
+
+		if (normal[1] < 0.85)
+			return false;
+
+		if (IsVegetation(hitEntity))
+			return false;
+
+		vector stand = sample;
+		stand[1] = hitY;
+		if (!OverheadClear(stand, 2))
+			return false;
+
+		for (int i = 0; i < 4; i++)
+		{
+			float angle = (i / 4.0) * Math.PI2;
+			vector edge = sample + Vector(Math.Cos(angle) * 0.75, 0, Math.Sin(angle) * 0.75);
+			float edgeTerrain = world.GetSurfaceY(edge[0], edge[2]);
+			float edgeY;
+			vector edgeNormal;
+			IEntity edgeEntity;
+			if (!TraceDownHit(world, edge, edgeTerrain + 40, edgeTerrain + 3, edgeY, edgeNormal, edgeEntity))
+				return false;
+
+			if (edgeNormal[1] < 0.85)
+				return false;
+
+			if (Math.AbsFloat(edgeY - hitY) > 0.35)
+				return false;
+
+			if (IsVegetation(edgeEntity))
+				return false;
+		}
+
+		// Just above the slab so the body does not start inside it.
+		stand[1] = hitY + 0.05;
+		pad = stand;
+		return true;
+	}
+
 	//------------------------------------------------------------------------------------------------
 	//! Terrain under the sample, not a roof or a boulder top.
 	protected static bool GroundAt(BaseWorld world, vector sample, out float hitY, out vector normal)
@@ -1479,6 +2033,32 @@ class JOLP_WorldUtils : Managed
 
 		hitY = trace.Start[1] + ((trace.End[1] - trace.Start[1]) * coef);
 		normal = trace.TraceNorm;
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Downward trace that also returns the entity, so a canopy can be told from a roof.
+	protected static bool TraceDownHit(BaseWorld world, vector position, float top, float bottom, out float hitY, out vector normal, out IEntity hitEntity)
+	{
+		hitY = position[1];
+		normal = vector.Up;
+		hitEntity = null;
+
+		TraceParam trace = new TraceParam();
+		trace.Flags = TraceFlags.WORLD | TraceFlags.ENTS;
+		trace.LayerMask = EPhysicsLayerDefs.Projectile;
+		trace.Start = position;
+		trace.Start[1] = top;
+		trace.End = position;
+		trace.End[1] = bottom;
+
+		float coef = world.TraceMove(trace, null);
+		if (coef <= 0.01 || coef >= 1)
+			return false;
+
+		hitY = trace.Start[1] + ((trace.End[1] - trace.Start[1]) * coef);
+		normal = trace.TraceNorm;
+		hitEntity = trace.TraceEnt;
 		return true;
 	}
 

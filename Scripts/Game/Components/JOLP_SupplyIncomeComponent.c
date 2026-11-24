@@ -52,15 +52,18 @@ class JOLP_GameClock
 
 //------------------------------------------------------------------------------------------------
 //! Server-only supply drip. Pays m_iSuppliesPerPeriod into the linked SUPPLIES generator
-//! each time one in-game period (second, minute, or hour) completes. The unfinished
-//! fraction is persisted as in-game hours so a restart does not pay it twice and does
-//! not throw it away.
+//! each time m_iPeriodCount of the chosen in-game unit completes (150 supplies every
+//! 15 minutes by default). The unfinished fraction is persisted as in-game hours so a
+//! restart does not pay it twice and does not throw it away.
 class JOLP_SupplyIncomeComponent : JOLP_Component
 {
-	[Attribute("500", UIWidgets.EditBox, "Supplies granted each time one in-game period completes")]
+	[Attribute("150", UIWidgets.EditBox, "Supplies granted each time one in-game period completes")]
 	protected int m_iSuppliesPerPeriod;
 
-	[Attribute("2", UIWidgets.ComboBox, "In-game time unit that period is measured in", "", ParamEnumArray.FromEnum(JOLP_SupplyIncomeTimeUnit))]
+	[Attribute("15", UIWidgets.EditBox, "How many of the selected time unit make one grant. 15 minutes is one stock write instead of a drip.")]
+	protected int m_iPeriodCount;
+
+	[Attribute("1", UIWidgets.ComboBox, "In-game time unit that period is measured in", "", ParamEnumArray.FromEnum(JOLP_SupplyIncomeTimeUnit))]
 	protected JOLP_SupplyIncomeTimeUnit m_eTimeUnit;
 
 	[Attribute("5000", UIWidgets.EditBox, "Real-time tick interval (ms) used to poll the in-game clock. Several periods can pay on one tick.")]
@@ -83,6 +86,17 @@ class JOLP_SupplyIncomeComponent : JOLP_Component
 	protected bool m_bRunning;
 	protected int m_iSeedAttempts;
 	protected int m_iServerWaitAttempts;
+	protected int m_iWakeAttempts;
+	protected int m_iCompositionsSpawned;
+
+	protected static ref array<JOLP_SupplyIncomeComponent> s_aLive;
+	protected static ref array<IEntity> s_aWakeHits;
+	protected static ref array<SCR_EditorLinkComponent> s_aWakeLinks;
+	protected static vector s_vWakeOrigin;
+
+	//! Building service looks 150 m, a vehicle depot 185 m. A garage at the edge of the build radius still has to be found.
+	protected static const float SUPPLY_LINK_RADIUS = 250.0;
+	protected static const int SUPPLY_LINK_ATTEMPTS = 10;
 
 	//------------------------------------------------------------------------------------------------
 	float GetUnpaidGameHours()
@@ -130,6 +144,9 @@ class JOLP_SupplyIncomeComponent : JOLP_Component
 
 		// World-placed HQs init before GameMode / replication is ready — defer server start.
 		GetGame().GetCallqueue().CallLater(TryStartServer, 0, false);
+		// The build prompt is what normally subscribes the supply consumer. Do that here
+		// so arsenal and vehicle garage can spend the pile without a player walking inside.
+		GetGame().GetCallqueue().CallLater(WakeSupplyLinks, 500, false);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -166,6 +183,7 @@ class JOLP_SupplyIncomeComponent : JOLP_Component
 	//------------------------------------------------------------------------------------------------
 	override void OnDelete(IEntity owner)
 	{
+		GetGame().GetCallqueue().Remove(WakeSupplyLinks);
 		StopIncome();
 		super.OnDelete(owner);
 	}
@@ -177,6 +195,7 @@ class JOLP_SupplyIncomeComponent : JOLP_Component
 			return;
 
 		m_bRunning = true;
+		RegisterLive();
 		if (!m_bSeedApplied)
 			ApplyInitialSeed();
 		if (!m_bClockSampled)
@@ -196,7 +215,46 @@ class JOLP_SupplyIncomeComponent : JOLP_Component
 			return;
 
 		m_bRunning = false;
+		UnregisterLive();
 		GetGame().GetCallqueue().Remove(PollIncome);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Drops a clock jump out of the next income poll. Called before and after an admin time skip,
+	//! in the same function, so the poll cannot observe the skipped hours.
+	static void SnapAllClocks()
+	{
+		if (!s_aLive)
+			return;
+
+		foreach (JOLP_SupplyIncomeComponent income : s_aLive)
+		{
+			if (!income)
+				continue;
+
+			income.SampleClock();
+		}
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected void RegisterLive()
+	{
+		if (!s_aLive)
+			s_aLive = new array<JOLP_SupplyIncomeComponent>();
+
+		if (s_aLive.Contains(this))
+			return;
+
+		s_aLive.Insert(this);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected void UnregisterLive()
+	{
+		if (!s_aLive)
+			return;
+
+		s_aLive.RemoveItem(this);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -345,25 +403,36 @@ class JOLP_SupplyIncomeComponent : JOLP_Component
 	//------------------------------------------------------------------------------------------------
 	protected int GetPeriodSeconds()
 	{
+		int unitSeconds = 3600;
 		if (m_eTimeUnit == JOLP_SupplyIncomeTimeUnit.SECOND)
-			return 1;
+			unitSeconds = 1;
+		else if (m_eTimeUnit == JOLP_SupplyIncomeTimeUnit.MINUTE)
+			unitSeconds = 60;
 
-		if (m_eTimeUnit == JOLP_SupplyIncomeTimeUnit.MINUTE)
-			return 60;
+		int count = m_iPeriodCount;
+		if (count <= 0)
+			count = 1;
 
-		return 3600;
+		return unitSeconds * count;
 	}
 
 	//------------------------------------------------------------------------------------------------
 	protected string GetPeriodLabel()
 	{
+		string unit = "hour";
 		if (m_eTimeUnit == JOLP_SupplyIncomeTimeUnit.SECOND)
-			return "second";
+			unit = "second";
+		else if (m_eTimeUnit == JOLP_SupplyIncomeTimeUnit.MINUTE)
+			unit = "minute";
 
-		if (m_eTimeUnit == JOLP_SupplyIncomeTimeUnit.MINUTE)
-			return "minute";
+		int count = m_iPeriodCount;
+		if (count <= 0)
+			count = 1;
 
-		return "hour";
+		if (count == 1)
+			return unit;
+
+		return string.Format("%1 %2", count, unit);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -537,6 +606,270 @@ class JOLP_SupplyIncomeComponent : JOLP_Component
 		}
 
 		return amount - remaining;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Subscribe HQ, arsenal, and vehicle-garage supply consumers the way the build prompt does
+	//! when a player stands in front of it. Runs on the server and on each client: the server
+	//! queue is what spending uses, and the local queue is what the action prompt reads.
+	protected void WakeSupplyLinks()
+	{
+		if (m_iWakeAttempts >= SUPPLY_LINK_ATTEMPTS)
+			return;
+
+		IEntity owner = GetOwner();
+		BaseWorld world = GetGame().GetWorld();
+		if (!owner || !world)
+			return;
+
+		m_iWakeAttempts++;
+
+		s_aWakeHits = new array<IEntity>();
+		s_aWakeLinks = new array<SCR_EditorLinkComponent>();
+		s_vWakeOrigin = owner.GetOrigin();
+		world.QueryEntitiesBySphere(
+			s_vWakeOrigin,
+			SUPPLY_LINK_RADIUS,
+			CollectWakeCandidate,
+			null,
+			EQueryEntitiesFlags.STATIC | EQueryEntitiesFlags.DYNAMIC);
+
+		array<IEntity> hits = {};
+		if (s_aWakeHits)
+			hits.Copy(s_aWakeHits);
+		s_aWakeHits = null;
+
+		array<SCR_EditorLinkComponent> links = {};
+		if (s_aWakeLinks)
+			links.Copy(s_aWakeLinks);
+		s_aWakeLinks = null;
+
+		// Depots and arsenal boxes are editor-linked children. Their service catalog
+		// (the "Depot HELIPAD offers N vehicles" line) runs when those links spawn.
+		// Spawn them here so that does not wait for a player to enter the HQ.
+		int spawnedLinks = SpawnPendingCompositions(links);
+		m_iCompositionsSpawned += spawnedLinks;
+
+		if (spawnedLinks > 0)
+		{
+			s_aWakeHits = new array<IEntity>();
+			world.QueryEntitiesBySphere(
+				s_vWakeOrigin,
+				SUPPLY_LINK_RADIUS,
+				CollectWakeCandidate,
+				null,
+				EQueryEntitiesFlags.STATIC | EQueryEntitiesFlags.DYNAMIC);
+
+			hits.Clear();
+			if (s_aWakeHits)
+				hits.Copy(s_aWakeHits);
+			s_aWakeHits = null;
+			s_aWakeLinks = null;
+		}
+
+		int spenders;
+		int linked = ApplySupplyLink(hits, spenders);
+
+		if (m_iWakeAttempts < SUPPLY_LINK_ATTEMPTS)
+		{
+			GetGame().GetCallqueue().CallLater(WakeSupplyLinks, 1000, false);
+			return;
+		}
+
+		if (spenders <= 0 || linked < spenders)
+		{
+			Print(string.Format("[JOLP] Supply link near %1 linked %2 of %3 spender(s)",
+				owner.GetName(), linked, spenders), LogLevel.WARNING);
+			return;
+		}
+
+		Print(string.Format("[JOLP] Supply link awake near %1: %2 spender(s) see the supply pile, %3 composition(s) spawned",
+			owner.GetName(), spenders, m_iCompositionsSpawned), LogLevel.NORMAL);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static bool CollectWakeCandidate(IEntity entity)
+	{
+		if (!entity)
+			return true;
+
+		SCR_EditorLinkComponent link = SCR_EditorLinkComponent.Cast(entity.FindComponent(SCR_EditorLinkComponent));
+		if (link && !link.IsSpawned() && !CompositionIsUnderConstruction(entity))
+		{
+			if (!s_aWakeLinks)
+				s_aWakeLinks = new array<SCR_EditorLinkComponent>();
+
+			if (s_aWakeLinks.Find(link) < 0)
+				s_aWakeLinks.Insert(link);
+		}
+
+		SCR_ResourceComponent resource = SCR_ResourceComponent.Cast(entity.FindComponent(SCR_ResourceComponent));
+		if (!resource)
+			return true;
+
+		if (!IsSupplySpender(entity) && !HasSharedSupplyContainer(resource))
+			return true;
+
+		if (!s_aWakeHits)
+			s_aWakeHits = new array<IEntity>();
+
+		if (s_aWakeHits.Find(entity) >= 0)
+			return true;
+
+		s_aWakeHits.Insert(entity);
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static int SpawnPendingCompositions(notnull array<SCR_EditorLinkComponent> links)
+	{
+		if (!Replication.IsServer())
+			return 0;
+
+		int spawned;
+		foreach (SCR_EditorLinkComponent link : links)
+		{
+			if (!link || link.IsSpawned())
+				continue;
+
+			IEntity owner = link.GetOwner();
+			if (!owner || CompositionIsUnderConstruction(owner))
+				continue;
+
+			link.SpawnComposition();
+			if (link.IsSpawned())
+				spawned++;
+		}
+
+		return spawned;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! A layout or the unfinished flag means a player is still building this. Do not finish it for them.
+	protected static bool CompositionIsUnderConstruction(IEntity entity)
+	{
+		if (!entity)
+			return false;
+
+		IEntity child = entity.GetChildren();
+		while (child)
+		{
+			if (SCR_CampaignBuildingLayoutComponent.Cast(child.FindComponent(SCR_CampaignBuildingLayoutComponent)))
+				return true;
+
+			child = child.GetSibling();
+		}
+
+		SCR_EditableEntityComponent editable = SCR_EditableEntityComponent.Cast(entity.FindComponent(SCR_EditableEntityComponent));
+		if (editable && editable.HasEntityFlag(EEditableEntityFlag.SPAWN_UNFINISHED))
+			return true;
+
+		return false;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static bool IsSupplySpender(IEntity entity)
+	{
+		if (SCR_CampaignBuildingProviderComponent.Cast(entity.FindComponent(SCR_CampaignBuildingProviderComponent)))
+			return true;
+
+		if (SCR_CatalogEntitySpawnerComponent.Cast(entity.FindComponent(SCR_CatalogEntitySpawnerComponent)))
+			return true;
+
+		return SCR_ArsenalComponent.Cast(entity.FindComponent(SCR_ArsenalComponent)) != null;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static bool HasSharedSupplyContainer(notnull SCR_ResourceComponent resource)
+	{
+		SCR_ResourceContainer container;
+		if (!resource.GetContainer(EResourceType.SUPPLIES, container) || !container)
+			return false;
+
+		return !container.IsIsolated();
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Flags storages into the resource grid, then queries that grid for each spender.
+	//! Returns how many spenders ended up with at least one supply container.
+	protected int ApplySupplyLink(notnull array<IEntity> hits, out int spenders)
+	{
+		spenders = 0;
+
+		SCR_ResourceGrid grid = GetGame().GetResourceGrid();
+		ChimeraWorld chimera = ChimeraWorld.CastFrom(GetGame().GetWorld());
+		if (!grid || !chimera)
+			return 0;
+
+		SCR_ResourceSystem system = SCR_ResourceSystem.Cast(chimera.FindSystem(SCR_ResourceSystem));
+		if (!system)
+			return 0;
+
+		foreach (IEntity entity : hits)
+		{
+			if (!entity)
+				continue;
+
+			SCR_ResourceComponent resource = SCR_ResourceComponent.Cast(entity.FindComponent(SCR_ResourceComponent));
+			if (resource)
+				resource.FlagForProcessing();
+		}
+
+		grid.ProcessFlaggedItems();
+
+		int linked;
+		foreach (IEntity entity : hits)
+		{
+			if (!entity || !IsSupplySpender(entity))
+				continue;
+
+			SCR_ResourceComponent resource = SCR_ResourceComponent.Cast(entity.FindComponent(SCR_ResourceComponent));
+			if (!resource)
+				continue;
+
+			spenders++;
+			if (LinkSupplyInteractors(resource, system, grid))
+				linked++;
+		}
+
+		return linked;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected bool LinkSupplyInteractors(notnull SCR_ResourceComponent resource, notnull SCR_ResourceSystem system, notnull SCR_ResourceGrid grid)
+	{
+		bool linked;
+
+		array<SCR_ResourceConsumer> consumers = resource.GetConsumers();
+		if (consumers)
+		{
+			foreach (SCR_ResourceConsumer consumer : consumers)
+			{
+				if (!consumer || consumer.GetResourceType() != EResourceType.SUPPLIES || consumer.IsIsolated())
+					continue;
+
+				system.RegisterSubscribedInteractor(consumer);
+				grid.UpdateInteractor(consumer);
+				if (consumer.GetContainerCount() > 0)
+					linked = true;
+			}
+		}
+
+		array<SCR_ResourceGenerator> generators = resource.GetGenerators();
+		if (generators)
+		{
+			foreach (SCR_ResourceGenerator generator : generators)
+			{
+				if (!generator || generator.GetResourceType() != EResourceType.SUPPLIES || generator.IsIsolated())
+					continue;
+
+				system.RegisterSubscribedInteractor(generator);
+				grid.UpdateInteractor(generator);
+			}
+		}
+
+		resource.Replicate();
+		return linked;
 	}
 
 	//------------------------------------------------------------------------------------------------

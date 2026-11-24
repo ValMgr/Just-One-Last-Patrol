@@ -97,31 +97,31 @@ class JOLP_CivilianConfig : Managed
 	[Attribute(defvalue: "20000", desc: "Refund a villager if their body never appears (ms)")]
 	int m_iAgentGraceMs;
 
-	[Attribute(defvalue: "8", desc: "Foot villagers in a village before the mission percent")]
+	[Attribute(defvalue: "5", desc: "Foot villagers in a village before the mission percent")]
 	int m_iVillageFoot;
 
 	[Attribute(defvalue: "1", desc: "Concurrent civilian cars in a village before the mission percent")]
 	int m_iVillageVehicles;
 
-	[Attribute(defvalue: "16", desc: "Foot villagers in a town before the mission percent")]
+	[Attribute(defvalue: "10", desc: "Foot villagers in a town before the mission percent")]
 	int m_iTownFoot;
 
 	[Attribute(defvalue: "2", desc: "Concurrent civilian cars in a town before the mission percent")]
 	int m_iTownVehicles;
 
-	[Attribute(defvalue: "32", desc: "Foot villagers in a city before the mission percent")]
+	[Attribute(defvalue: "16", desc: "Foot villagers in a city before the mission percent")]
 	int m_iCityFoot;
 
-	[Attribute(defvalue: "4", desc: "Concurrent civilian cars in a city before the mission percent")]
+	[Attribute(defvalue: "3", desc: "Concurrent civilian cars in a city before the mission percent")]
 	int m_iCityVehicles;
 
-	[Attribute(defvalue: "0.2", desc: "Very low: ceiling share of a town's foot budget for terrorists. Each visit rolls from none up to this")]
+	[Attribute(defvalue: "0.4", desc: "Very low: ceiling share of a town's foot budget for terrorists. Each visit rolls from none up to this")]
 	float m_fVeryLowTerroristShare;
 
 	[Attribute(defvalue: "0.85", desc: "Very low: ceiling share of a town's foot budget for partisans. Each visit rolls from none up to this")]
 	float m_fVeryLowPartisanShare;
 
-	[Attribute(defvalue: "0.1", desc: "Low: ceiling share of a town's foot budget for terrorists. Each visit rolls from none up to this")]
+	[Attribute(defvalue: "0.2", desc: "Low: ceiling share of a town's foot budget for terrorists. Each visit rolls from none up to this")]
 	float m_fLowTerroristShare;
 
 	[Attribute(defvalue: "0.4", desc: "Low: ceiling share of a town's foot budget for partisans. Each visit rolls from none up to this")]
@@ -148,7 +148,7 @@ class JOLP_CivilianConfig : Managed
 	[Attribute(defvalue: "25", desc: "Reputation below this (and at or above Moderate) is High. At or above is Very high")]
 	float m_fStageHighBelow;
 
-	[Attribute(defvalue: "0.05", desc: "Reputation gained for each milician who actually dies")]
+	[Attribute(defvalue: "0.1", desc: "Reputation gained for each milician who actually dies")]
 	float m_fReputationPerMilicianKill;
 
 	[Attribute(defvalue: "-0.5", desc: "Reputation when a player injures a civilian")]

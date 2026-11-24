@@ -7,5 +7,6 @@ class JOLP_SelfRadialCatalog
 	{
 		actions.Clear();
 		actions.Insert(new JOLP_CallCiviliansRadialAction());
+		actions.Insert(new JOLP_AdminRadialAction());
 	}
 }

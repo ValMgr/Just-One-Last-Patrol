@@ -17,7 +17,9 @@ GenericEntity : "{94D9E9B690F98756}PrefabsEditable/Auto/Compositions/Slotted/Slo
    }
   }
   JOLP_SupplyIncomeComponent "{664B13AF00000112}" {
-   m_iSuppliesPerPeriod 500
+   m_iSuppliesPerPeriod 150
+   m_iPeriodCount 15
+   m_eTimeUnit MINUTE
    m_bPreferProviderPool 1
    m_iInitialSupplies 0
   }

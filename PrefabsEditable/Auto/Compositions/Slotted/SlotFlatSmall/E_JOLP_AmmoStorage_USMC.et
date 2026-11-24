@@ -6,6 +6,16 @@ GenericEntity : "{1BED8F81D2FA2137}PrefabsEditable/Auto/Compositions/Slotted/Slo
   }
   JOLP_PersistentCompositionComponent "{664B13B0A1000071}" {
   }
+  SCR_EditorLinkComponent "{5E5C73D179FEB54A}" {
+   m_aEntries {
+    SCR_EditorLinkEntry "{5E5C73D179CAE304}" {
+     m_Prefab "{664B13B0A10008EC}PrefabsEditable/Auto/Compositions/Misc/SubCompositions/Storage/E_JOLP_Shelter_Arsenal_Weapons.et"
+    }
+    SCR_EditorLinkEntry "{5E5C73D179F48914}" {
+     m_Prefab "{664B13B0A10008ED}PrefabsEditable/Auto/Compositions/Misc/SubCompositions/Storage/E_JOLP_Shelter_Arsenal_Equipment.et"
+    }
+   }
+  }
   SCR_EditableEntityComponent "{5E588CA1750A5E42}" {
    m_UIInfo SCR_EditableEntityUIInfo "{5298E609432D192D}" {
     Name "Ammo Storage"

@@ -109,7 +109,7 @@ class JOLP_LoadoutManagerComponent : JOLP_Component
 		else
 			list.Insert(loadout);
 
-		Print(string.Format("[JOLP] Saved loadout '%1' for %2 (%3 items)", trimmed, identity, loadout.m_aItems.Count()), LogLevel.NORMAL);
+		Print(string.Format("[JOLP] Saved loadout '%1' for %2 (%3 pieces)", trimmed, identity, JOLP_LoadoutGear.CountPieces(loadout)), LogLevel.NORMAL);
 		return true;
 	}
 
@@ -134,9 +134,10 @@ class JOLP_LoadoutManagerComponent : JOLP_Component
 	}
 
 	//------------------------------------------------------------------------------------------------
-	bool Describe(int playerId, string name, IEntity character, IEntity arsenal, out string text, out string error)
+	bool Describe(int playerId, string name, IEntity character, IEntity arsenal, out string text, out string cost, out string error)
 	{
 		text = string.Empty;
+		cost = string.Empty;
 		error = string.Empty;
 		if (!Replication.IsServer())
 		{
@@ -156,7 +157,7 @@ class JOLP_LoadoutManagerComponent : JOLP_Component
 		JOLP_LoadoutGear.Extract(character, worn);
 		int wornCost = JOLP_LoadoutGear.Price(worn, costType);
 		int supplies = JOLP_LoadoutSupplies.Read(arsenal);
-		text = JOLP_LoadoutGear.Describe(saved, costType, wornCost, supplies);
+		JOLP_LoadoutGear.Describe(saved, costType, wornCost, supplies, text, cost);
 		return true;
 	}
 

@@ -322,6 +322,10 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 	{
 		int storedSnapshot = data.m_iGarrisonStored + CountLocalLiveAgents(data.m_iId);
 
+		// Once, when the place wakes. A refill tick must not keep rolling until a sniper appears.
+		if (m_bOpeningSpawn)
+			need = need - TryOpeningSniper(data, need);
+
 		int guard = 0;
 		while (need > 0 && data.m_iGarrisonStored > 0 && guard < 8)
 		{
@@ -332,6 +336,50 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 
 			need -= charged;
 		}
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! One sharpshooter in a town or a city, and only on the wake-up that rolled him. 0 when the roll misses, the budget is short, or no roof will hold him.
+	protected int TryOpeningSniper(notnull JOLP_LocationData data, int need)
+	{
+		if (data.IsHideout())
+			return 0;
+
+		if (data.m_eSettlementSize != JOLP_SettlementSize.CITY && data.m_eSettlementSize != JOLP_SettlementSize.TOWN)
+			return 0;
+
+		JOLP_MilicianGarrisonConfig config = GetConfig();
+		if (!config || config.m_fSniperChance <= 0)
+			return 0;
+
+		if (Math.RandomFloat01() >= config.m_fSniperChance)
+			return 0;
+
+		if (HasLiveSniper(data.m_iId))
+			return 0;
+
+		if (!RoleFits(JOLP_MilicianGroupRole.SNIPER, data, need))
+			return 0;
+
+		return TryAddRole(data, JOLP_MilicianGroupRole.SNIPER, need, true, 0);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected bool HasLiveSniper(int locationId)
+	{
+		if (!m_aLiveGroups)
+			return false;
+
+		foreach (JOLP_LiveGroupRecord record : m_aLiveGroups)
+		{
+			if (!record || record.m_iSourceLocationId != locationId)
+				continue;
+
+			if (record.m_eRole == JOLP_MilicianGroupRole.SNIPER)
+				return true;
+		}
+
+		return false;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -425,6 +473,8 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 				return Math.Max(1, config.m_iCheckpointAgents);
 			case JOLP_MilicianGroupRole.REINFORCEMENT:
 				return Math.Max(1, config.m_iReinforceAgents);
+			case JOLP_MilicianGroupRole.SNIPER:
+				return Math.Max(1, config.m_iSniperAgents);
 		}
 
 		return 4;
@@ -470,6 +520,8 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 				return config.RandomPrefab(config.m_aCheckpointGroupPrefabs);
 			case JOLP_MilicianGroupRole.REINFORCEMENT:
 				return config.RandomPrefab(config.m_aReinforceGroupPrefabs);
+			case JOLP_MilicianGroupRole.SNIPER:
+				return config.RandomPrefab(config.m_aSniperGroupPrefabs);
 		}
 
 		return ResourceName.Empty;
@@ -532,6 +584,14 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 			return 0;
 		}
 
+		// The mission list may hold the sniper character instead of a group. A character is not an SCR_AIGroup, so the cast below fails and nothing is fielded.
+		ResourceName memberPrefab = "";
+		if (role == JOLP_MilicianGroupRole.SNIPER && !IsAIGroupPrefab(groupPrefab))
+		{
+			memberPrefab = groupPrefab;
+			groupPrefab = "{0C9C86FCE951AF19}Prefabs/Groups/INDFOR/AmbientPatrols/Group_FIA_LoneWolfSniper_NotSpawned.et";
+		}
+
 		JOLP_MilicianGarrisonConfig config = GetConfig();
 		float area = data.m_fActivationRadius;
 		if (area < 40)
@@ -550,7 +610,21 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 		array<vector> nearbyPlayers = {};
 		bool hideFromPlayers = HideSpawnFromPlayers(data, nearbyPlayers);
 		bool placed = false;
-		if (role == JOLP_MilicianGroupRole.SENTRY && data.IsHideout())
+		if (role == JOLP_MilicianGroupRole.SNIPER)
+		{
+			array<vector> players = {};
+			float clearance = PlayerClearance();
+			JOLP_WorldUtils.CollectLivingPlayerPositions(data.m_vPosition, area + clearance, players);
+			if (!JOLP_WorldUtils.FindElevatedStand(data.m_vPosition, area, occupied, 4, players, clearance, spawnPos))
+			{
+				Print(string.Format("[JOLP] No roof or tower for a sniper at '%1'", data.m_sName), LogLevel.NORMAL);
+				return 0;
+			}
+
+			placed = true;
+		}
+
+		if (!placed && role == JOLP_MilicianGroupRole.SENTRY && data.IsHideout())
 		{
 			nestIndex = data.ClaimHideoutNest();
 			if (nestIndex >= 0)
@@ -611,6 +685,9 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 
 		if (!clear)
 		{
+			if (role == JOLP_MilicianGroupRole.SNIPER)
+				return 0;
+
 			if (nestIndex >= 0)
 			{
 				data.ReleaseHideoutNest(nestIndex);
@@ -632,7 +709,7 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 				compositionId = composition.GetID();
 		}
 
-		bool manualMembers = role == JOLP_MilicianGroupRole.SENTRY;
+		bool manualMembers = role == JOLP_MilicianGroupRole.SENTRY || role == JOLP_MilicianGroupRole.SNIPER;
 		if (manualMembers)
 			SCR_AIGroup.IgnoreSpawning(true);
 
@@ -643,6 +720,7 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 		SCR_AIGroup group = SCR_AIGroup.Cast(groupEnt);
 		if (!group)
 		{
+			JOLP_WorldUtils.DeleteEntitySafe(groupEnt);
 			if (compositionId)
 				JOLP_WorldUtils.DeleteEntitySafe(GetGame().GetWorld().FindEntityByID(compositionId));
 			if (nestIndex >= 0)
@@ -652,7 +730,8 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 		}
 
 		ApplyMilicianFaction(group);
-		if (manualMembers && FillGroupMembers(group, groupPrefab, spawnPos, spawnAngles, cost) <= 0)
+		bool snapMembers = role != JOLP_MilicianGroupRole.SNIPER;
+		if (manualMembers && FillGroupMembers(group, groupPrefab, spawnPos, spawnAngles, cost, snapMembers, memberPrefab) <= 0)
 		{
 			JOLP_WorldUtils.DeleteEntitySafe(group);
 			if (compositionId)
@@ -737,6 +816,12 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 					JOLP_MilicianWaypointHelper.AssignDefend(group, record, config.m_rDefendWaypointPrefab, nest.m_vPosition);
 				else
 					AssignRandomLocalMission(data, group, record, area, 0.45);
+				break;
+			}
+			case JOLP_MilicianGroupRole.SNIPER:
+			{
+				// No waypoint. A defend order paths on the ground navmesh and walks him off the tower.
+				HoldSniper(group);
 				break;
 			}
 			case JOLP_MilicianGroupRole.PATROL:
@@ -1638,13 +1723,17 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 
 	//------------------------------------------------------------------------------------------------
 	//! The sentry prefab is not left to spawn its authored pair. Members are created here so the count can be 2 or 3.
-	protected int FillGroupMembers(notnull SCR_AIGroup group, ResourceName groupPrefab, vector origin, vector angles, int count)
+	//! snapToSurface false keeps a roof perch. GetSurfaceY would put that body under the building.
+	protected int FillGroupMembers(notnull SCR_AIGroup group, ResourceName groupPrefab, vector origin, vector angles, int count, bool snapToSurface = true, ResourceName memberPrefab = "")
 	{
 		if (count <= 0)
 			return 0;
 
 		array<ResourceName> slots = {};
-		ReadGroupMemberPrefabs(groupPrefab, slots);
+		if (!memberPrefab.IsEmpty())
+			slots.Insert(memberPrefab);
+		else
+			ReadGroupMemberPrefabs(groupPrefab, slots);
 		if (slots.IsEmpty())
 		{
 			ResourceName fallback = GetConfig().m_rDriverPrefab;
@@ -1659,9 +1748,14 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 		int spawned = 0;
 		for (int i = 0; i < count; i++)
 		{
-			float side = i - (count * 0.5);
-			vector pos = origin + Vector(side * 0.9, 0, 0);
-			pos = SnapSurface(pos);
+			vector pos = origin;
+			if (snapToSurface)
+			{
+				float side = i - (count * 0.5);
+				pos = origin + Vector(side * 0.9, 0, 0);
+				pos = SnapSurface(pos);
+			}
+
 			IEntity body = JOLP_WorldUtils.SpawnEntityPrefab(slots[slotIndex], pos, angles, true);
 			slotIndex++;
 			if (slotIndex >= slots.Count())
@@ -1680,6 +1774,27 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 		}
 
 		return spawned;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected bool IsAIGroupPrefab(ResourceName prefab)
+	{
+		if (prefab.IsEmpty())
+			return false;
+
+		Resource resource = Resource.Load(prefab);
+		if (!resource || !resource.IsValid())
+			return false;
+
+		BaseResourceObject resourceObject = resource.GetResource();
+		if (!resourceObject)
+			return false;
+
+		IEntitySource source = resourceObject.ToEntitySource();
+		if (!source)
+			return false;
+
+		return source.GetClassName() == "SCR_AIGroup";
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -1811,6 +1926,7 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 	//------------------------------------------------------------------------------------------------
 	//! returnInfantry puts living passengers back in the source pool. Crew never count as infantry.
 	//! returnVehicle puts a surviving hull back in that same place's stock.
+	//! A hull whose crew is dead or unconscious stays where it is and is not restocked.
 	protected int DespawnRecord(notnull JOLP_LiveGroupRecord record, bool returnInfantry, bool returnVehicle = false)
 	{
 		bool crewSeparate = record.m_CrewGroupId && record.m_CrewGroupId != record.m_GroupId;
@@ -1822,6 +1938,31 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 				infantryAlive = JOLP_WorldUtils.CountLivingAgents(group);
 		}
 
+		IEntity vehicle = null;
+		if (record.m_VehicleId)
+			vehicle = GetGame().GetWorld().FindEntityByID(record.m_VehicleId);
+
+		SCR_AIGroup crewGroup = null;
+		if (record.m_CrewGroupId)
+			crewGroup = SCR_AIGroup.Cast(GetGame().GetWorld().FindEntityByID(record.m_CrewGroupId));
+		else if (record.m_eVehicleClass != JOLP_VehicleClass.NONE)
+			crewGroup = group;
+
+		bool hullOk = vehicle && !JOLP_VehicleCrew.IsHullDestroyed(vehicle);
+		bool neutralized = hullOk && JOLP_VehicleCrew.IsCrewNeutralized(vehicle, crewGroup);
+		if (neutralized)
+		{
+			// Seated men stay in the hull. They are not stored back, or the town would spawn a second copy.
+			if (group && (crewSeparate || record.m_eVehicleClass == JOLP_VehicleClass.NONE))
+			{
+				infantryAlive = infantryAlive - JOLP_VehicleCrew.CountGroupOccupants(vehicle, group);
+				if (infantryAlive < 0)
+					infantryAlive = 0;
+			}
+
+			JOLP_VehicleCrew.ReleaseOccupants(vehicle);
+		}
+
 		JOLP_MilicianWaypointHelper.DeleteTrackedWaypoints(record);
 		ReleaseGroup(record.m_GroupId);
 		if (crewSeparate)
@@ -1830,13 +1971,9 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 		if (record.m_CompositionId)
 			JOLP_WorldUtils.DeleteEntitySafe(GetGame().GetWorld().FindEntityByID(record.m_CompositionId));
 
-		IEntity vehicle = null;
-		if (record.m_VehicleId)
-			vehicle = GetGame().GetWorld().FindEntityByID(record.m_VehicleId);
-
-		bool hullOk = vehicle && !JOLP_VehicleCrew.IsHullDestroyed(vehicle);
-		// A destroyed hull stays where it was knocked out. Only an intact one is removed.
-		if (vehicle && hullOk)
+		// A destroyed hull stays where it was knocked out.
+		// An intact hull stays too when its crew is dead or unconscious. Only a hull someone can still fight from is removed.
+		if (vehicle && hullOk && !neutralized)
 			JOLP_WorldUtils.DeleteEntitySafe(vehicle);
 
 		JOLP_LocationData source = JOLP_Global.GetLocations().GetLocation(record.m_iSourceLocationId);
@@ -1845,8 +1982,11 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 			if (returnInfantry)
 				source.m_iGarrisonStored = source.m_iGarrisonStored + infantryAlive;
 
-			if (returnVehicle && hullOk)
+			if (returnVehicle && hullOk && !neutralized)
 				source.AddVehicleStock(record.m_eVehicleClass, 1);
+
+			if (neutralized)
+				Print(string.Format("[JOLP] Neutralized vehicle left at '%1'", source.m_sName), LogLevel.NORMAL);
 		}
 
 		return infantryAlive;
@@ -1891,8 +2031,8 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 	}
 
 	//------------------------------------------------------------------------------------------------
-	//! Crew is gone and the hull is not. Keep it at the settlement the player is in.
-	//! Returns false when nobody is there, so the caller can put an unseen hull back in stock.
+	//! Crew is dead or unconscious and the hull is not. Keep it at the settlement the player is in.
+	//! Returns false when nobody is there. The caller leaves that hull in the world and does not restock it.
 	protected bool ParkAbandonedVehicle(notnull JOLP_LiveGroupRecord record)
 	{
 		JOLP_LocationManagerComponent locations = JOLP_Global.GetLocations();
@@ -1965,19 +2105,31 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 				}
 			}
 
-			if (!group || JOLP_WorldUtils.CountLivingAgents(group) <= 0)
+			bool operatorsDown = !group || JOLP_WorldUtils.CountLivingAgents(group) <= 0;
+			// Unconscious men still sit in the group. The hull is neutralized only when the crew is down too.
+			if (!operatorsDown && record.m_VehicleId && !JOLP_VehicleCrew.HasFightingMember(group))
+			{
+				SCR_AIGroup crewStillUp = null;
+				if (record.m_CrewGroupId && record.m_CrewGroupId != record.m_GroupId)
+					crewStillUp = SCR_AIGroup.Cast(GetGame().GetWorld().FindEntityByID(record.m_CrewGroupId));
+
+				if (!JOLP_VehicleCrew.HasFightingMember(crewStillUp))
+					operatorsDown = true;
+			}
+
+			if (operatorsDown)
 			{
 				IEntity wreck = null;
 				if (record.m_VehicleId)
 					wreck = GetGame().GetWorld().FindEntityByID(record.m_VehicleId);
 
 				bool hullOk = wreck && !JOLP_VehicleCrew.IsHullDestroyed(wreck);
-				// Crew are dead. Leave an intact hull here until the player leaves.
+				// Crew are dead or unconscious. Leave an intact hull here while the player is still around.
 				// Putting it back in stock now makes this place spawn a replacement.
 				if (hullOk && ParkAbandonedVehicle(record))
 					continue;
 
-				// Intact and unseen: put it back. Destroyed: leave the wreck, do not restock.
+				// Crew down: leave the hull, do not restock. A hull someone can still fight from goes back into stock.
 				DespawnRecord(record, false, hullOk);
 				m_aLiveGroups.Remove(i);
 				continue;
@@ -2075,6 +2227,16 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 					if (hullAlive)
 					{
 						TrySeatReinforcement(record);
+						// Unload where the fight is, before the town-center arrival radius.
+						if (VehicleContactDrop(record, group, hull, target, now))
+						{
+							record.m_bArrived = true;
+							record.m_fArrivedAtWorldTime = now;
+							Print(string.Format("[JOLP] Vehicle dropping troops under contact near '%1'", target.m_sName), LogLevel.NORMAL);
+							FinishVehicleArrival(record, target, group, true);
+							continue;
+						}
+
 						if (record.m_bQRF)
 						{
 							SCR_AIGroup driver = DriverGroup(record, group);
@@ -2421,6 +2583,44 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 		record.m_vQRFHuntPosition = contact;
 		record.m_fQRFHuntOrderedAt = now;
 		Print(string.Format("[JOLP] QRF searching for the spotted player near '%1'", target.m_sName), LogLevel.NORMAL);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Passenger trucks unload when the fight is on them. The town-center radius is only for a quiet arrival.
+	protected bool VehicleContactDrop(notnull JOLP_LiveGroupRecord record, notnull SCR_AIGroup group, notnull IEntity hull, notnull JOLP_LocationData target, float now)
+	{
+		if (!record.m_bCarriesSquad || !record.m_CrewGroupId || record.m_CrewGroupId == record.m_GroupId)
+			return false;
+
+		vector from = hull.GetOrigin();
+		vector seen;
+		bool sees = GroupSeesPlayer(group, seen);
+		if (!sees)
+		{
+			SCR_AIGroup crew = SCR_AIGroup.Cast(GetGame().GetWorld().FindEntityByID(record.m_CrewGroupId));
+			sees = crew && GroupSeesPlayer(crew, seen);
+		}
+
+		if (sees && JOLP_WorldUtils.DistanceFlat(from, seen) <= 300)
+			return true;
+
+		vector playerPos;
+		if (JOLP_WorldUtils.NearestLivingPlayerPosition(from, playerPos) && JOLP_WorldUtils.DistanceFlat(from, playerPos) <= 200)
+			return true;
+
+		vector contact;
+		if (FreshPlayerContact(target, now, contact) && JOLP_WorldUtils.DistanceFlat(from, contact) <= 200)
+			return true;
+
+		// Diverted onto a road by the fight, then stopped there short of the center.
+		if (!record.m_bQRF && PlayersFightingAt(target) && record.m_fQRFHuntOrderedAt >= 0)
+		{
+			SCR_AIGroup driver = DriverGroup(record, group);
+			if (driver && QRFReachedRoad(driver, record, from))
+				return true;
+		}
+
+		return false;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -3012,6 +3212,35 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! Stay on the perch. Idle speed so a contact does not send him walking to the ground navmesh.
+	protected void HoldSniper(notnull SCR_AIGroup group)
+	{
+		SCR_AIGroupMovementComponent movement = SCR_AIGroupMovementComponent.Cast(group.FindComponent(SCR_AIGroupMovementComponent));
+		if (movement)
+			movement.SetGroupCharactersWantedMovementType(EMovementType.IDLE);
+
+		SCR_AIGroupSettingsComponent settings = SCR_AIGroupSettingsComponent.Cast(group.FindComponent(SCR_AIGroupSettingsComponent));
+		if (!settings)
+			return;
+
+		SCR_AIGroupCharactersMovementSpeedSetting setting = SCR_AIGroupCharactersMovementSpeedSetting.Create(SCR_EAISettingOrigin.EDITOR, EMovementType.IDLE);
+		if (setting)
+			settings.AddSetting(setting, true, true);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected void HoldSniperBody(notnull IEntity body)
+	{
+		SCR_AIInfoComponent info = SCR_AIInfoComponent.Cast(body.FindComponent(SCR_AIInfoComponent));
+		if (info)
+			info.SetMovementType(EMovementType.IDLE);
+
+		AICharacterMovementComponent movement = AICharacterMovementComponent.Cast(body.FindComponent(AICharacterMovementComponent));
+		if (movement)
+			movement.SetMovementTypeWanted(EMovementType.IDLE);
+	}
+
+	//------------------------------------------------------------------------------------------------
 	protected void OnMilicianAgentAdded(AIAgent agent)
 	{
 		if (!agent)
@@ -3032,6 +3261,8 @@ class JOLP_MilicianManagerComponent : JOLP_Component
 		JOLP_PersistenceManagerComponent.UntrackTransient(body);
 		ApplyMilicianFaction(group, body);
 		JOLP_AISkillConfig.Apply(body, GetSkillConfig().m_eMilicianSkill);
+		if (record.m_eRole == JOLP_MilicianGroupRole.SNIPER)
+			HoldSniperBody(body);
 		TrySeatReinforcement(record);
 		TrySeatNestGunner(record, body);
 

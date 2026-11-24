@@ -44,6 +44,11 @@ GenericEntity JOLP_MilicianManager1 : "{664B13AF00000045}Prefabs/Managers/JOLP_M
      "{C289D03E4F13A740}Prefabs/Groups/MEI/Group_MEI_RifleSquad.et"
      "{2F91C1FC6ADAB3D9}Prefabs/Groups/MEI/Group_MEI_Team_Suppress.et"
     }
+    m_fSniperChance 1
+    m_aSniperGroupPrefabs {
+     "{95F67CCC15CAB4CE}Prefabs/Characters/Factions/IND/MEI/Character_MEI_Sniper.et"
+    }
+    m_iSniperAgents 1
     m_aTransportVehiclePrefabs {
      "{6B8DBBC5D4D86E5D}Prefabs/Vehicles/Wheeled/Ural4320/Ural4320_transport_covered_FIA_T_brown.et"
      "{7D284EBA54991DC5}Prefabs/Vehicles/Wheeled/UAZ469/UAZ469_covered_FIA_T_brown.et"
@@ -67,9 +72,9 @@ GenericEntity JOLP_CivilianManager1 : "{664B13AF00000060}Prefabs/Managers/JOLP_C
  components {
   JOLP_CivilianManagerComponent "{664B13AF00000062}" {
    m_Config JOLP_CivilianConfig "{664B13AF00000063}" {
-    m_iVillageFoot 7
-    m_iTownFoot 13
-    m_iCityFoot 28
+    m_iVillageFoot 5
+    m_iTownFoot 9
+    m_iCityFoot 16
     m_iCityVehicles 3
     m_fStageVeryLowBelow 0
     m_fStageLowBelow 5

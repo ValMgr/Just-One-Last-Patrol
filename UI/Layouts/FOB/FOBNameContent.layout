@@ -8,7 +8,10 @@ VerticalLayoutWidgetClass {
    Slot LayoutSlot "{664B13AF00000169}" {
     Padding 0 8 0 0
    }
-   HeightOverride 72
+   AllowHeightOverride 1
+   HeightOverride 88
+   AllowMinDesiredHeight 1
+   MinDesiredHeight 88
    {
     EditBoxWidgetClass "{664B13B0A1000726}" {
      Name "NameInput"

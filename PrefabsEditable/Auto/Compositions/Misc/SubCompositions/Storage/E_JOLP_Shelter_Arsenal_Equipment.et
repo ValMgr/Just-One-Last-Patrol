@@ -1,0 +1,17 @@
+GenericEntity : "{0ABB1556F320F0F9}PrefabsEditable/Auto/Compositions/Misc/SubCompositions/Storage/E_Shelter_Arsenal_US_02.et" {
+ ID "5282DCB5DFC8538F"
+ components {
+  SCR_EditorLinkComponent "{5EF0B7B0C1B1BF8F}" {
+   m_aEntries {
+    SCR_EditorLinkEntry "{5EF0B7B0C1B2CC2E}" {
+     m_Prefab "{664B13B0A10008EB}PrefabsEditable/Auto/Props/Military/Compositions/US/E_JOLP_ArsenalBox_Equipment.et"
+    }
+   }
+  }
+ }
+ {
+  GenericEntity : "{664B13B0A10008EB}PrefabsEditable/Auto/Props/Military/Compositions/US/E_JOLP_ArsenalBox_Equipment.et" {
+   ID "5D371ACBFA947460"
+  }
+ }
+}

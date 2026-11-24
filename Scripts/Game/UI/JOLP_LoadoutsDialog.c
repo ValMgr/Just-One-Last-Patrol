@@ -4,13 +4,14 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 {
 	protected static const ResourceName PRESETS = "{664B13B0A1000865}Configs/UI/JOLP_LoadoutsDialog.conf";
 	protected static const string PRESET_TAG = "loadouts";
-	protected static const ResourceName BUTTON_LAYOUT = "{87037226B1A2064B}UI/layouts/WidgetLibrary/Buttons/WLib_NavigationButtonSuperSmall.layout";
+	protected static const ResourceName BUTTON_LAYOUT = "{664B13B0A1000890}UI/Layouts/Loadout/LoadoutRow.layout";
 
 	protected static JOLP_LoadoutsDialog s_Instance;
 
 	protected RplId m_ArsenalId;
 	protected TextWidget m_Detail;
-	protected ref array<SCR_InputButtonComponent> m_aButtons;
+	protected RichTextWidget m_Cost;
+	protected ref array<SCR_ButtonBaseComponent> m_aButtons;
 	protected ref array<string> m_aNames;
 	protected string m_sSelected;
 	protected bool m_bBusy;
@@ -23,12 +24,22 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 
 		JOLP_LoadoutsDialog dialog = new JOLP_LoadoutsDialog();
 		dialog.m_ArsenalId = arsenalId;
+		s_Instance = dialog;
 
 		SCR_ConfigurableDialogUi opened = SCR_ConfigurableDialogUi.CreateFromPreset(PRESETS, PRESET_TAG, dialog);
 		if (!opened)
+		{
+			s_Instance = null;
 			return;
+		}
 
 		s_Instance = JOLP_LoadoutsDialog.Cast(opened);
+		if (!s_Instance)
+			return;
+
+		// The reply can arrive inside CreateFromPreset, before this returns.
+		// Ask again once the list widget is in the tree.
+		s_Instance.Refresh();
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -48,7 +59,7 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 	}
 
 	//------------------------------------------------------------------------------------------------
-	static void DeliverDetail(bool ok, string message, string detail)
+	static void DeliverDetail(bool ok, string message, string detail, string cost)
 	{
 		if (!s_Instance)
 			return;
@@ -61,6 +72,7 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 
 		s_Instance.SetMessage("");
 		s_Instance.SetDetail(detail);
+		s_Instance.SetCost(cost);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -79,6 +91,7 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 
 		s_Instance.m_sSelected = string.Empty;
 		s_Instance.SetDetail("Select a loadout.");
+		s_Instance.SetCost("");
 		s_Instance.Refresh();
 	}
 
@@ -103,6 +116,7 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 	override void OnMenuClose()
 	{
 		m_Detail = null;
+		m_Cost = null;
 		m_aButtons = null;
 		m_aNames = null;
 		m_bBusy = false;
@@ -121,7 +135,6 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 			m_Detail = TextWidget.Cast(root.FindAnyWidget("Detail"));
 
 		SetDetail("Select a loadout.");
-		Refresh();
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -167,11 +180,16 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 		Widget list = ListWidget();
 		WorkspaceWidget workspace = GetGame().GetWorkspace();
 		if (!list || !workspace)
+		{
+			if (!packed.IsEmpty())
+				SetMessage(packed);
 			return;
+		}
 
 		if (m_aNames.IsEmpty())
 		{
 			SetDetail("You have no saved loadouts.");
+			SetCost("");
 			return;
 		}
 
@@ -181,21 +199,21 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 			if (!widget)
 				continue;
 
-			AlignableSlot.SetHorizontalAlign(widget, LayoutHorizontalAlign.Stretch);
-			AlignableSlot.SetPadding(widget, 0, 4, 0, 4);
+			AlignableSlot.SetHorizontalAlign(widget, LayoutHorizontalAlign.Left);
+			AlignableSlot.SetPadding(widget, 0, 2, 0, 2);
 
-			SCR_InputButtonComponent button = SCR_InputButtonComponent.Cast(widget.FindHandler(SCR_InputButtonComponent));
+			SCR_ButtonComponent button = SCR_ButtonComponent.Cast(widget.FindHandler(SCR_ButtonComponent));
 			if (!button)
 				continue;
 
-			button.SetLabel(m_aNames[i]);
-			button.m_OnActivated.Insert(OnRow);
+			SetRowLabel(button, m_aNames[i]);
+			button.m_OnClicked.Insert(OnRow);
 			m_aButtons.Insert(button);
 		}
 	}
 
 	//------------------------------------------------------------------------------------------------
-	protected void OnRow(SCR_InputButtonComponent button)
+	protected void OnRow(SCR_ButtonBaseComponent button)
 	{
 		if (m_bBusy || !m_aButtons || !m_aNames)
 			return;
@@ -219,6 +237,7 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 			}
 
 			SetDetail("Checking price...");
+			SetCost("");
 			network.AskDetail(m_ArsenalId, m_sSelected);
 			return;
 		}
@@ -284,25 +303,68 @@ class JOLP_LoadoutsDialog : SCR_ConfigurableDialogUi
 				continue;
 
 			if (m_aNames[i] == m_sSelected)
-				m_aButtons[i].SetLabel("> " + m_aNames[i]);
+				SetRowLabel(m_aButtons[i], "> " + m_aNames[i]);
 			else
-				m_aButtons[i].SetLabel(m_aNames[i]);
+				SetRowLabel(m_aButtons[i], m_aNames[i]);
 		}
 	}
 
 	//------------------------------------------------------------------------------------------------
 	protected void SetDetail(string text)
 	{
+		Widget root = GetRootWidget();
+		if (root)
+			m_Detail = TextWidget.Cast(root.FindAnyWidget("Detail"));
+
 		if (m_Detail)
+		{
 			m_Detail.SetText(text);
-		else
-			SetMessage(text);
+			return;
+		}
+
+		RichTextWidget rich = null;
+		if (root)
+			rich = RichTextWidget.Cast(root.FindAnyWidget("Detail"));
+
+		if (rich)
+		{
+			rich.SetText(text);
+			return;
+		}
+
+		SetMessage(text);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected void SetRowLabel(SCR_ButtonBaseComponent button, string label)
+	{
+		if (!button)
+			return;
+
+		Widget root = button.GetRootWidget();
+		if (!root)
+			return;
+
+		TextWidget name = TextWidget.Cast(root.FindAnyWidget("Name"));
+		if (name)
+			name.SetText(label);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected void SetCost(string text)
+	{
+		Widget root = GetRootWidget();
+		if (root)
+			m_Cost = RichTextWidget.Cast(root.FindAnyWidget("Cost"));
+
+		if (m_Cost)
+			m_Cost.SetText(text);
 	}
 
 	//------------------------------------------------------------------------------------------------
 	protected void ClearRows()
 	{
-		m_aButtons = new array<SCR_InputButtonComponent>();
+		m_aButtons = new array<SCR_ButtonBaseComponent>();
 		m_aNames = new array<string>();
 
 		Widget list = ListWidget();

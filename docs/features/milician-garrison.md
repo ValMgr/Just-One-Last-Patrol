@@ -91,7 +91,7 @@ Name, type (TOWN/OP/HIDEOUT), settlement size, activation radius, initial garris
 ### Milician manager (`Manager.layer` → `JOLP_MilicianManager`)
 Select the entity near Faction/Loadout managers. Edit `m_Config`:
 
-- **Group Prefab**: sentry, patrol, checkpoint, reinforcement, and reinforcement vehicle lists. One entry is picked at random per spawn
+- **Group Prefab**: sentry, patrol, checkpoint, reinforcement, sniper, and reinforcement vehicle lists. One entry is picked at random per spawn
 - Faction key (default `USSR`, the OPFOR side, so milician stay distinct from FIA partisans)
 - Checkpoint **composition** prefab (fortifications + static weapon)
 - Waypoint prefabs (Defend / Patrol / Move / Cycle)
@@ -107,6 +107,7 @@ Config defaults: [`Configs/Milician/MilicianGarrison.conf`](../../Configs/Milici
 - **Patrol** — Wide cycle (~1.2× radius); after max duration, survivors return to stored (location stays active).
 - **Checkpoint** — Snap to nearest road, spawn composition + Defend infantry; both removed on location despawn.
 - **Reinforcement** — Vehicle leaves from a clear stretch of road, crew rides, and the move order ends on a road inside the target. No clear road means the squad walks. Exempt from source despawn; after arrival + 2 min, living count added to **target** stored.
+- **Sniper** — Towns and cities. 15% when the garrison first wakes, one man on a flat roof or tower. No move order: he stays on the perch and only turns. No roof spends the roll; he is not placed on the ground. Refills do not roll again. Villages and hideouts do not roll.
 
 Hideout timer regenerates men, then deducts from hideout stored (keeps `m_iHideoutDefenseReserve`, default 4).
 

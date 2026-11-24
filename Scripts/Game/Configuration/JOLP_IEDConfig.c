@@ -38,6 +38,9 @@ class JOLP_IEDConfig : Managed
 	[Attribute(defvalue: "40", desc: "Metres. A civilian death this close to a charge that just detonated is an IED kill")]
 	float m_fKillRadius;
 
+	[Attribute(defvalue: "{72BEEF40AF179763}Prefabs/Weapons/Warheads/Explosions/Explosion_Tnt_Large.et", uiwidget: UIWidgets.ResourceNamePicker, desc: "Spawned when a charge detonates. This is the blast that kills. The RUK shell under it often does not", params: "et")]
+	ResourceName m_rBlastPrefab;
+
 	[Attribute(defvalue: "30", desc: "Minimum metres between charges of the same place")]
 	float m_fMinSpacing;
 

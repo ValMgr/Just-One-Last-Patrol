@@ -48,6 +48,10 @@ class JOLP_GameMasterComponent : JOLP_Component
 		if (!Replication.IsServer() || playerId <= 0)
 			return;
 
+		JOLP_AdminNetworkComponent admin = JOLP_AdminNetworkComponent.FromPlayer(playerId);
+		if (admin)
+			admin.RefreshTools();
+
 		SCR_EditorManagerCore core = GetEditorCore();
 		if (!core)
 			return;
@@ -147,7 +151,7 @@ class JOLP_GameMasterComponent : JOLP_Component
 
 	//------------------------------------------------------------------------------------------------
 	//! Offline play and Workbench are debug sessions. A live server keeps the editor for admins.
-	protected bool IsEligible(int playerId)
+	bool IsEligible(int playerId)
 	{
 		if (!Replication.IsRunning())
 			return true;

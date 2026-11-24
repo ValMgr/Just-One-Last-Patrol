@@ -17,6 +17,8 @@ class JOLP_IEDManagerComponent : JOLP_Component
 	protected bool m_bRestoredFromSave;
 	protected int m_iLastDailyKey;
 	protected ref array<ref JOLP_IEDRecord> m_aCharges;
+	//! Charges that already spawned their killing blast. A charge can own more than one trigger.
+	protected ref array<EntityID> m_aBlastedIds;
 
 	//------------------------------------------------------------------------------------------------
 	static JOLP_IEDManagerComponent GetInstance()
@@ -124,6 +126,34 @@ class JOLP_IEDManagerComponent : JOLP_Component
 		JOLP_CivilianManagerComponent civilians = JOLP_Global.GetCivilians();
 		if (civilians)
 			civilians.NotifyIEDDefused(record.m_iLocationId, record.m_vPosition, user);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! The RUK trigger just fired. Spawn the killing blast once. A defused charge never reaches this
+	//! with m_bDefused still false, and a second trigger on the same charge is ignored.
+	void NotifyChargeDetonated(IEntity charge)
+	{
+		if (!Replication.IsServer() || !charge)
+			return;
+
+		if (!m_aBlastedIds)
+			m_aBlastedIds = new array<EntityID>();
+
+		EntityID id = charge.GetID();
+		if (m_aBlastedIds.Contains(id))
+			return;
+
+		JOLP_IEDRecord record = FindRecordFromEntity(charge);
+		if (record && (record.m_bDefused || record.m_bDetonated))
+			return;
+
+		m_aBlastedIds.Insert(id);
+		if (record)
+			MarkDetonated(record);
+
+		vector pos = charge.GetOrigin();
+		pos[1] = pos[1] + 0.5;
+		SpawnLethalBlast(pos);
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -283,6 +313,31 @@ class JOLP_IEDManagerComponent : JOLP_Component
 
 		m_iLastDailyKey = dateKey;
 		RunDaily();
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! An admin clock skip is not a new day. If the landing time is already at or past the
+	//! daily hour, that calendar day is marked done so the jump does not plant charges.
+	//! A landing time before the daily hour still runs the check when that hour arrives.
+	void AcknowledgeAdminTimeSkip()
+	{
+		if (!Replication.IsServer())
+			return;
+
+		int dateKey;
+		int hour;
+		if (!ReadClock(dateKey, hour))
+			return;
+
+		int dailyHour = 8;
+		if (m_Config && m_Config.m_iDailyHour >= 0)
+			dailyHour = m_Config.m_iDailyHour;
+
+		if (hour < dailyHour)
+			return;
+
+		m_iLastDailyKey = dateKey;
+		m_bClockPrimed = true;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -926,6 +981,26 @@ class JOLP_IEDManagerComponent : JOLP_Component
 			return;
 
 		DisarmTriggers(charge);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Instant blast, lifted off the ground so the warhead is not buried in the road.
+	protected void SpawnLethalBlast(vector position)
+	{
+		ResourceName explosion = GetConfig().m_rBlastPrefab;
+		if (explosion.IsEmpty())
+		{
+			Print("[JOLP] IED detonated with no blast prefab set", LogLevel.WARNING);
+			return;
+		}
+
+		if (!JOLP_WorldUtils.SpawnEntityPrefab(explosion, position, "0 0 0", true))
+		{
+			Print("[JOLP] IED blast prefab failed to spawn", LogLevel.WARNING);
+			return;
+		}
+
+		Print(string.Format("[JOLP] IED blast at %1", position), LogLevel.NORMAL);
 	}
 
 	//------------------------------------------------------------------------------------------------

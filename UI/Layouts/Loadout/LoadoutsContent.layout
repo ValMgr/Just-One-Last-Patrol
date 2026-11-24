@@ -3,47 +3,64 @@ VerticalLayoutWidgetClass {
  Slot LayoutSlot "{664B13B0A1000880}" {
  }
  {
-  SizeLayoutWidgetClass "{664B13B0A100086B}" {
-   Name "ListSize"
+  VerticalLayoutWidgetClass "{664B13B0A100086D}" {
+   Name "LoadoutList"
    Slot LayoutSlot "{664B13B0A1000881}" {
     Padding 0 8 0 0
+    HorizontalAlign 0
    }
-   HeightOverride 220
+  }
+  SizeLayoutWidgetClass "{664B13B0A1000898}" {
+   Name "CostSize"
+   Slot LayoutSlot "{664B13B0A100089A}" {
+    Padding 4 12 4 0
+   }
+   AllowHeightOverride 1
+   HeightOverride 96
+   AllowMinDesiredHeight 1
+   MinDesiredHeight 96
    {
-    ScrollLayoutWidgetClass "{664B13B0A100086C}" {
-     Name "ListScroll"
-     Slot LayoutSlot "{664B13B0A1000882}" {
-      HorizontalAlign 3
-      VerticalAlign 3
+    RichTextWidgetClass "{664B13B0A1000899}" {
+     Name "Cost"
+     Slot LayoutSlot "{664B13B0A100089B}" {
+      HorizontalAlign 0
+      VerticalAlign 0
      }
-     {
-      VerticalLayoutWidgetClass "{664B13B0A100086D}" {
-       Name "LoadoutList"
-       Slot LayoutSlot "{664B13B0A1000883}" {
-        HorizontalAlign 3
-       }
-      }
-     }
+     Color 0.95 0.85 0.55 1
+     "Font Size" 18
+     Text ""
     }
    }
   }
   SizeLayoutWidgetClass "{664B13B0A100088C}" {
    Name "DetailSize"
    Slot LayoutSlot "{664B13B0A1000885}" {
-    Padding 0 12 0 0
+    Padding 0 8 0 0
    }
-   HeightOverride 200
+   AllowHeightOverride 1
+   HeightOverride 220
+   AllowMinDesiredHeight 1
+   MinDesiredHeight 220
    {
-    MultilineTextWidgetClass "{664B13B0A100086E}" {
-     Name "Detail"
-     Slot LayoutSlot "{664B13B0A1000884}" {
+    ScrollLayoutWidgetClass "{664B13B0A1000896}" {
+     Name "DetailScroll"
+     Slot LayoutSlot "{664B13B0A1000897}" {
       HorizontalAlign 3
-      VerticalAlign 0
-      Padding 4 0 4 0
+      VerticalAlign 3
      }
-     Color 0.9 0.9 0.9 1
-     "Font Size" 18
-     Text "Select a loadout."
+     {
+      RichTextWidgetClass "{664B13B0A100086E}" {
+       Name "Detail"
+       Slot AlignableSlot "{664B13B0A1000884}" {
+        HorizontalAlign 0
+        VerticalAlign 0
+        Padding 4 0 8 0
+       }
+       Color 0.9 0.9 0.9 1
+       "Font Size" 18
+       Text "Select a loadout."
+      }
+     }
     }
    }
   }

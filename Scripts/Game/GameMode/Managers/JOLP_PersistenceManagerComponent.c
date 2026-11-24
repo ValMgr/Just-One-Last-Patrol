@@ -27,6 +27,7 @@ class JOLP_PersistenceManagerComponent : ScriptComponent
 	protected bool m_bShutdownSaveRequested;
 	protected bool m_bHasSaveGame;
 	protected bool m_bSaveInProgress;
+	protected int m_iManualSavePlayerId;
 	protected static JOLP_PersistenceManagerComponent s_Instance;
 	protected ref array<ref JOLP_TransientUntrackEntry> m_aTransientUntrack;
 	protected bool m_bTransientUntrackScheduled;
@@ -60,7 +61,50 @@ class JOLP_PersistenceManagerComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void SaveGame()
 	{
-		RequestSavePoint(ESaveGameType.MANUAL);
+		string reason;
+		RequestManualSave(0, reason);
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Manual save requested by an admin. reason is set when this returns false.
+	//! The finished result is delivered to playerId from OnSavePointCompleted.
+	bool RequestManualSave(int playerId, out string reason)
+	{
+		reason = string.Empty;
+
+		if (!Replication.IsServer())
+		{
+			reason = "Cannot save.";
+			return false;
+		}
+
+		if (m_bSaveInProgress)
+		{
+			reason = "A save is already running.";
+			return false;
+		}
+
+		SaveGameManager manager = GetGame().GetSaveGameManager();
+		if (manager && manager.IsBusy())
+		{
+			reason = "A save is already running.";
+			return false;
+		}
+
+		if (!PassesSaveGates(reason))
+			return false;
+
+		m_iManualSavePlayerId = playerId;
+		if (!RequestSavePoint(ESaveGameType.MANUAL))
+		{
+			m_iManualSavePlayerId = 0;
+			if (reason.IsEmpty())
+				reason = "Cannot save.";
+
+			return false;
+		}
+
+		return true;
 	}
 
 	//------------------------------------------------------------------------------------------------
@@ -93,7 +137,8 @@ class JOLP_PersistenceManagerComponent : ScriptComponent
 	//------------------------------------------------------------------------------------------------
 	void AutoSave()
 	{
-		if (!PassesSaveGates())
+		string reason;
+		if (!PassesSaveGates(reason))
 			return;
 
 		SaveGameManager manager = GetGame().GetSaveGameManager();
@@ -158,11 +203,14 @@ class JOLP_PersistenceManagerComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	protected bool PassesSaveGates()
+	protected bool PassesSaveGates(out string reason)
 	{
+		reason = string.Empty;
+
 		JOLP_JustOneLastPatrolGameMode mode = JOLP_JustOneLastPatrolGameMode.Cast(GetGame().GetGameMode());
 		if (!mode || !mode.HasGameStarted())
 		{
+			reason = "The campaign has not started.";
 			Print("[JOLP] Cannot save: campaign has not started", LogLevel.WARNING);
 			return false;
 		}
@@ -170,12 +218,14 @@ class JOLP_PersistenceManagerComponent : ScriptComponent
 		SaveGameManager manager = GetGame().GetSaveGameManager();
 		if (!manager)
 		{
+			reason = "Cannot save.";
 			Print("[JOLP] Cannot save: no SaveGameManager", LogLevel.ERROR);
 			return false;
 		}
 
 		if (!manager.IsSavingAllowed())
 		{
+			reason = "Saving is disabled.";
 			Print("[JOLP] Cannot save: saving is disabled", LogLevel.WARNING);
 			return false;
 		}
@@ -184,10 +234,11 @@ class JOLP_PersistenceManagerComponent : ScriptComponent
 	}
 
 	//------------------------------------------------------------------------------------------------
-	protected void RequestSavePoint(ESaveGameType saveType)
+	protected bool RequestSavePoint(ESaveGameType saveType)
 	{
-		if (!PassesSaveGates())
-			return;
+		string reason;
+		if (!PassesSaveGates(reason))
+			return false;
 
 		SaveGameManager manager = GetGame().GetSaveGameManager();
 
@@ -197,12 +248,17 @@ class JOLP_PersistenceManagerComponent : ScriptComponent
 
 		m_bSaveInProgress = true;
 		manager.RequestSavePoint(saveType, string.Empty, flags, new SaveGameOperationCallback(OnSavePointCompleted));
+		return true;
 	}
 
 	//------------------------------------------------------------------------------------------------
 	protected void OnSavePointCompleted(bool success)
 	{
 		m_bSaveInProgress = false;
+
+		int playerId = m_iManualSavePlayerId;
+		m_iManualSavePlayerId = 0;
+
 		if (success)
 		{
 			m_bHasSaveGame = true;
@@ -212,6 +268,18 @@ class JOLP_PersistenceManagerComponent : ScriptComponent
 		{
 			Print("[JOLP] Save point failed", LogLevel.ERROR);
 		}
+
+		if (playerId <= 0)
+			return;
+
+		JOLP_AdminNetworkComponent admin = JOLP_AdminNetworkComponent.FromPlayer(playerId);
+		if (!admin)
+			return;
+
+		if (success)
+			admin.Reply("Game saved.");
+		else
+			admin.Reply("Save failed.");
 	}
 
 	//------------------------------------------------------------------------------------------------

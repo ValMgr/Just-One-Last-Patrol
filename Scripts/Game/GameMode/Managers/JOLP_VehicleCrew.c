@@ -79,6 +79,151 @@ class JOLP_VehicleCrew
 	}
 
 	//------------------------------------------------------------------------------------------------
+	//! True when someone in this group can still fight.
+	//! A member whose body has not appeared yet still counts, so a spawn tick cannot retire the vehicle.
+	static bool HasFightingMember(SCR_AIGroup group)
+	{
+		if (!group)
+			return false;
+
+		array<AIAgent> agents = {};
+		group.GetAgents(agents);
+		foreach (AIAgent agent : agents)
+		{
+			if (!agent)
+				continue;
+
+			IEntity body = agent.GetControlledEntity();
+			if (!body)
+				return true;
+
+			if (IsFightingFit(body))
+				return true;
+		}
+
+		return false;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Nobody left who can drive or fight from this hull. Crew on foot count. So do occupants.
+	static bool IsCrewNeutralized(IEntity vehicle, SCR_AIGroup crew)
+	{
+		if (HasFightingMember(crew))
+			return false;
+
+		if (!vehicle)
+			return true;
+
+		array<IEntity> occupants = {};
+		CollectOccupants(vehicle, occupants);
+		foreach (IEntity body : occupants)
+		{
+			if (IsFightingFit(body))
+				return false;
+		}
+
+		return true;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Occupants of this group who are sitting in the hull. They stay with it instead of returning to the pool.
+	static int CountGroupOccupants(IEntity vehicle, SCR_AIGroup group)
+	{
+		if (!vehicle || !group)
+			return 0;
+
+		int count = 0;
+		array<IEntity> occupants = {};
+		CollectOccupants(vehicle, occupants);
+		foreach (IEntity body : occupants)
+		{
+			if (OccupantGroup(body) == group)
+				count++;
+		}
+
+		return count;
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Drop seated bodies out of their AI group so deleting that group does not take the hull's crew with it.
+	static void ReleaseOccupants(IEntity vehicle)
+	{
+		if (!vehicle)
+			return;
+
+		array<IEntity> occupants = {};
+		CollectOccupants(vehicle, occupants);
+		foreach (IEntity body : occupants)
+		{
+			SCR_AIGroup group = OccupantGroup(body);
+			if (!group)
+				continue;
+
+			group.RemoveAIEntityFromGroup(body);
+		}
+	}
+
+	//------------------------------------------------------------------------------------------------
+	//! Alive and awake. Dead and unconscious (coma) cannot operate the hull.
+	protected static bool IsFightingFit(IEntity body)
+	{
+		SCR_ChimeraCharacter character = SCR_ChimeraCharacter.Cast(body);
+		if (!character)
+			return false;
+
+		CharacterControllerComponent controller = character.GetCharacterController();
+		if (!controller)
+			return false;
+
+		if (controller.GetLifeState() != ECharacterLifeState.ALIVE)
+			return false;
+
+		return !controller.IsUnconscious();
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static SCR_AIGroup OccupantGroup(IEntity body)
+	{
+		if (!body)
+			return null;
+
+		AIControlComponent control = AIControlComponent.Cast(body.FindComponent(AIControlComponent));
+		if (!control)
+			return null;
+
+		AIAgent agent = control.GetAIAgent();
+		if (!agent)
+			return null;
+
+		return SCR_AIGroup.Cast(agent.GetParentGroup());
+	}
+
+	//------------------------------------------------------------------------------------------------
+	protected static void CollectOccupants(notnull IEntity vehicle, notnull array<IEntity> occupants)
+	{
+		SCR_BaseCompartmentManagerComponent compartments = SCR_BaseCompartmentManagerComponent.Cast(
+			vehicle.FindComponent(SCR_BaseCompartmentManagerComponent));
+		if (!compartments)
+			return;
+
+		array<IEntity> pilots = {};
+		array<IEntity> gunners = {};
+		array<IEntity> cargo = {};
+		compartments.GetOccupantsOfType(pilots, ECompartmentType.PILOT);
+		compartments.GetOccupantsOfType(gunners, ECompartmentType.TURRET);
+		compartments.GetOccupantsOfType(cargo, ECompartmentType.CARGO);
+
+		foreach (IEntity body : pilots)
+			occupants.Insert(body);
+
+		foreach (IEntity body : gunners)
+			occupants.Insert(body);
+
+		foreach (IEntity body : cargo)
+			occupants.Insert(body);
+	}
+
+	//------------------------------------------------------------------------------------------------
 	protected static void CollectLoose(notnull SCR_AIGroup group, notnull IEntity vehicle, notnull array<IEntity> loose, bool includeCargo)
 	{
 		SCR_BaseCompartmentManagerComponent compartments = SCR_BaseCompartmentManagerComponent.Cast(

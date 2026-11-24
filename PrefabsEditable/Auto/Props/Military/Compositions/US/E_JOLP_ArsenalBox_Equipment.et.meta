@@ -1,5 +1,5 @@
 MetaFileClass {
- Name "{664B13B0A10008C4}Prefabs/Props/Military/Arsenal/AmmoBoxes/JOLP_AmmoBoxArsenal_HQ.et"
+ Name "{664B13B0A10008EB}PrefabsEditable/Auto/Props/Military/Compositions/US/E_JOLP_ArsenalBox_Equipment.et"
  Configurations {
   EntityTemplateResourceClass PC {
   }

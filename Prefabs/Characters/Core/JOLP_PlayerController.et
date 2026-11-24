@@ -11,6 +11,8 @@ SCR_PlayerController : "{225E51284CC95CFA}Prefabs/Characters/Core/DefaultPlayerC
   }
   JOLP_SelfRadialComponent "{664B13AF000001B2}" {
   }
+  JOLP_AdminNetworkComponent "{664B13B0A1000765}" {
+  }
   SCR_HUDManagerComponent "{2FDC275D9EBCDB8B}" {
    InfoDisplays {
     JOLP_SelfRadialDisplay "{664B13AF000001C2}" : "{2B36CB1A08905F22}Configs/HUD/RadialMenu/GlobalRadialMenuDisplay.conf" {

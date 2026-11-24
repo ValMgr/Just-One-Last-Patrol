@@ -4,6 +4,10 @@ GenericEntity {
   Hierarchy "{664B13B0A1000304}" {
    Enabled 1
   }
+  RplComponent "{664B13B0A1000306}" {
+   "Parent Node From Parent Entity" 1
+   Streamable Disabled
+  }
   ActionsManagerComponent "{664B13B0A1000303}" {
    ActionContexts {
     UserActionContext "{664B13B0A1000302}" {

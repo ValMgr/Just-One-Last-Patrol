@@ -1,0 +1,28 @@
+ButtonWidgetClass {
+ Name "LoadoutRow"
+ Slot LayoutSlot "{664B13B0A1000894}" {
+  HorizontalAlign 0
+ }
+ style blank
+ components {
+  SCR_ButtonComponent "{664B13B0A1000891}" {
+   m_bMouseOverToFocus 1
+   m_bUseColorization 0
+  }
+ }
+ {
+  TextWidgetClass "{664B13B0A1000893}" {
+   Name "Name"
+   Slot AlignableSlot "{664B13B0A1000895}" {
+    HorizontalAlign 0
+    VerticalAlign 1
+    Padding 4 4 8 4
+   }
+   Color 0.95 0.95 0.95 1
+   "Font Size" 20
+   "Horizontal Alignment" Left
+   "Vertical Alignment" Center
+   Text "Loadout"
+  }
+ }
+}

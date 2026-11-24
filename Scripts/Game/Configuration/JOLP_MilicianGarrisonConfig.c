@@ -117,6 +117,15 @@ class JOLP_MilicianGarrisonConfig : Managed
 	[Attribute(defvalue: "6", desc: "Reinforcement expected agent count (accounting)")]
 	int m_iReinforceAgents;
 
+	[Attribute(defvalue: "0.15", desc: "Chance a town or a city rolls one sniper when its garrison first wakes. Later refills do not roll again")]
+	float m_fSniperChance;
+
+	[Attribute(uiwidget: UIWidgets.ResourceAssignArray, desc: "Sniper groups. One prefab is picked at random per spawn. Members are placed on a roof, not on the ground", params: "et", category: "Group Prefab")]
+	ref array<ResourceName> m_aSniperGroupPrefabs;
+
+	[Attribute(defvalue: "1", desc: "Sniper expected agent count (accounting)")]
+	int m_iSniperAgents;
+
 	[Attribute(uiwidget: UIWidgets.ResourceAssignArray, desc: "Unarmed reinforcement vehicles. One prefab is picked at random per spawn", params: "et", category: "Vehicles")]
 	ref array<ResourceName> m_aTransportVehiclePrefabs;
 

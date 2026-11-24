@@ -1,0 +1,7 @@
+VerticalLayoutWidgetClass {
+ Name "Options"
+ Slot LayoutSlot "{664B13B0A1000764}" {
+ }
+ "Is Visible" 1
+ "Ignore Cursor" 0
+}

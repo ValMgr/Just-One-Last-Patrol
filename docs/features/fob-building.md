@@ -30,7 +30,7 @@ Thunderbolt / player HQs use `JOLP_BuildingService_US` (master provider) with th
 | `JOLP_PlayerController` | `SCR_CampaignBuildingNetworkComponent` |
 | `JOLP_Tent_CommandPost_US_01` → `JOLP_BuildingService_US` | Master provider + Show build preview |
 | `JOLP_Headquarters_*` | US HQ + supply seed (+ FOB controller on buildable) |
-| `JOLP_SupplyIncomeComponent` | One-shot seed / hourly drip into SUPPLIES |
+| `JOLP_SupplyIncomeComponent` | One-shot seed / 15-minute grant into SUPPLIES |
 | `JOLP_FOBControllerComponent` | Suppression radius + faction map marker |
 
 ## Supplies
@@ -38,7 +38,7 @@ Thunderbolt / player HQs use `JOLP_BuildingService_US` (master provider) with th
 - Currency is vanilla `EResourceType.SUPPLIES`.
 - Thunderbolt seeds **1000** into HQ `Storage_Supplies` (world override + `DoStartGame` / `JOLP_SupplyIncomeComponent`).
 - Seed prefers the BuildingService generator (encapsulator → child crate meshes), then the Storage_Supplies virtual container via `SetResourceValue`.
-- Supply Production grants **500** per completed in-game hour.
+- Supply Production grants **150** every **15** in-game minutes.
 - Costs / refunds use CAMPAIGN budget (100% refund default).
 
 ## Build catalog
