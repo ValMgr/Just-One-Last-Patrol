@@ -707,10 +707,10 @@ modded class SCR_CatalogEntitySpawnerComponent
 }
 
 //------------------------------------------------------------------------------------------------
-//! Built depots link the vanilla service, which has no per-vehicle actions.
-//! Replace the spawned barrels after the links exist. Do not mod SCR_EditorLinkEntry:
-//! that class is stored inside prefabs, and a modded container class makes the engine
-//! report "Unknown class 'SCR_EditorLinkEntry'", which drops the ghost and the finished build.
+//! Built depots link the vanilla service. Point those links at the JOLP service
+//! before they spawn. Do not mod SCR_EditorLinkEntry: that class is stored inside
+//! prefabs, and a modded container class makes the engine report
+//! "Unknown class 'SCR_EditorLinkEntry'", which drops the ghost and the finished build.
 modded class SCR_EditorLinkComponent
 {
 	protected static const ResourceName JOLP_SERVICE_SMALL = "{D4573A9778DB3CB0}PrefabsEditable/Auto/Props/Military/Compositions/US/E_VehicleService_US_Small.et";
@@ -721,66 +721,28 @@ modded class SCR_EditorLinkComponent
 	//------------------------------------------------------------------------------------------------
 	override void SpawnComposition()
 	{
+		// Retarget before the link spawns. Deleting the vanilla barrels after they
+		// spawn removes their RplComponent during world load and the server then
+		// rejects the join: "destroyed during loading of the world".
+		JOLP_RetargetVehicleServiceLinks();
 		super.SpawnComposition();
-		JOLP_ReplaceVehicleServices();
 	}
 
 	//------------------------------------------------------------------------------------------------
-	protected void JOLP_ReplaceVehicleServices()
+	protected void JOLP_RetargetVehicleServiceLinks()
 	{
-		if (!m_aLinkedChildren)
+		if (!m_aEntries)
 			return;
 
-		IEntity owner = GetOwner();
-		if (!owner)
-			return;
-
-		for (int i = m_aLinkedChildren.Count() - 1; i >= 0; i--)
+		foreach (SCR_EditorLinkEntry entry : m_aEntries)
 		{
-			IEntity child = m_aLinkedChildren[i];
-			if (!child)
+			if (!entry)
 				continue;
 
-			EntityPrefabData prefabData = child.GetPrefabData();
-			if (!prefabData)
-				continue;
-
-			ResourceName replacement;
-			ResourceName prefab = prefabData.GetPrefabName();
-			if (prefab == JOLP_SERVICE_SMALL)
-				replacement = JOLP_SERVICE_LIGHT;
-			else if (prefab == JOLP_SERVICE_MEDIUM)
-				replacement = JOLP_SERVICE_HEAVY;
-			else
-				continue;
-
-			Resource resource = Resource.Load(replacement);
-			if (!resource || !resource.IsValid())
-				continue;
-
-			vector parentTransform[4];
-			vector childTransform[4];
-			owner.GetTransform(parentTransform);
-			child.GetTransform(childTransform);
-
-			EntitySpawnParams params = new EntitySpawnParams();
-			params.TransformMode = ETransformMode.LOCAL;
-			params.Parent = owner;
-			Math3D.MatrixInvMultiply4(parentTransform, childTransform, params.Transform);
-
-			IEntity swapped = GetGame().SpawnEntityPrefab(resource, owner.GetWorld(), params);
-			if (!swapped)
-				continue;
-
-			m_aLinkedChildren.Set(i, swapped);
-			SCR_EntityHelper.DeleteEntityAndChildren(child);
-
-			// The parent link already fired OnLinkedEntitiesSpawned, which is what
-			// makes a depot load its vehicle list. The replacement was spawned after
-			// that event, so register it directly.
-			SCR_ServicePointComponent service = SCR_ServicePointComponent.Cast(swapped.FindComponent(SCR_ServicePointComponent));
-			if (service)
-				service.RegisterService();
+			if (entry.m_Prefab == JOLP_SERVICE_SMALL)
+				entry.m_Prefab = JOLP_SERVICE_LIGHT;
+			else if (entry.m_Prefab == JOLP_SERVICE_MEDIUM)
+				entry.m_Prefab = JOLP_SERVICE_HEAVY;
 		}
 	}
 }

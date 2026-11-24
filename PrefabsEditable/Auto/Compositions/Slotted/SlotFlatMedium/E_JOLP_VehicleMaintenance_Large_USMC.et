@@ -12,4 +12,10 @@ GenericEntity : "{7AD06D9CF2672AC5}PrefabsEditable/Auto/Compositions/Slotted/Slo
   JOLP_PersistentCompositionComponent "{664B13B0A1000085}" {
   }
  }
+ {
+  GenericEntity JOLP_VehicleSpawnActions : "{664B13B0A1000300}Prefabs/Systems/JOLP_VehicleSpawnActions.et" {
+   ID "664B13B0A1000308"
+   coords 0 0 0
+  }
+ }
 }
